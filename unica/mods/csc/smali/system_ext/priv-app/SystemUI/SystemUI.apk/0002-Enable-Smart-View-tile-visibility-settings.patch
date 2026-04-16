@@ -7,29 +7,14 @@ Subject: [PATCH] Enable Smart View tile visibility settings
  smali/com/android/systemui/QpRune.smali | 12 +-----------
  1 file changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/smali/com/android/systemui/QpRune.smali b/smali/com/android/systemui/QpRune.smali
-index 101dc880f..3a0a8861a 100644
---- a/smali/com/android/systemui/QpRune.smali
-+++ b/smali/com/android/systemui/QpRune.smali
-@@ -308,17 +308,7 @@
- 
-     sput-boolean v3, Lcom/android/systemui/QpRune;->QUICK_TILE_FLASHLIGHT_INTENSITY:Z
- 
--    invoke-static {}, Lcom/samsung/android/feature/SemCscFeature;->getInstance()Lcom/samsung/android/feature/SemCscFeature;
--
--    move-result-object v3
--
--    const-string v4, "CscFeature_Common_SupportZProjectFunctionInGlobal"
--
--    invoke-virtual {v3, v4, v2}, Lcom/samsung/android/feature/SemCscFeature;->getBoolean(Ljava/lang/String;Z)Z
--
--    move-result v3
--
--    sput-boolean v3, Lcom/android/systemui/QpRune;->QUICK_TILE_HIDE_FROM_BAR:Z
-+    sput-boolean v1, Lcom/android/systemui/QpRune;->QUICK_TILE_HIDE_FROM_BAR:Z
- 
-     invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
- 
+diff --git a/smali_classes2/com/android/systemui/highlight/HighlightContentProvider.smali b/smali_classes2/com/android/systemui/highlight/HighlightContentProvider.smali
+--- a/smali_classes2/com/android/systemui/highlight/HighlightContentProvider.smali
++++ b/smali_classes2/com/android/systemui/highlight/HighlightContentProvider.smali
+@@ -1,3 +1,3 @@
+ .class public Lcom/android/systemui/highlight/HighlightContentProvider;
+-.super Landroid/content/ContentProvider;
++.super Landroid/content/ContentProvider;
+ .source "qb/108628248 06db940abc7068e6a58a0fc6720e38fc11a4092dcc24eb6846bad4258e895ca1"
 -- 
-2.51.0
-
+2.43.0
+# patchgenerate

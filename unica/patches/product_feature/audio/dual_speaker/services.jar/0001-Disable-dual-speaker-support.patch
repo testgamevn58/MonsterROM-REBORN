@@ -8,10 +8,9 @@ Subject: [PATCH] Disable dual speaker support
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/smali/com/android/server/audio/AudioService.smali b/smali/com/android/server/audio/AudioService.smali
-index 3c264d433..f4f4cc5b2 100644
 --- a/smali/com/android/server/audio/AudioService.smali
 +++ b/smali/com/android/server/audio/AudioService.smali
-@@ -7815,9 +7815,7 @@
+@@ -6851,9 +6851,7 @@
  
      invoke-virtual {p1, v0}, Ljava/io/PrintWriter;->print(Ljava/lang/String;)V
  
@@ -22,15 +21,14 @@ index 3c264d433..f4f4cc5b2 100644
  
      const-string v2, "  mVolumeLimitOn="
  
-@@ -8078,6 +8076,8 @@
+@@ -7111,6 +7109,8 @@
+     move-result-object v3
  
      invoke-virtual {p1, v3}, Ljava/io/PrintWriter;->println(Ljava/lang/String;)V
- 
-+    const/4 v0, 0x1
 +
++    const/4 v0, 0x1
+ 
      invoke-virtual {v2, v0}, Lcom/samsung/android/server/audio/MultiSoundManager;->getPinDevice(Z)I
  
-     move-result v3
 -- 
-2.51.0
-
+2.43.0

@@ -274,7 +274,8 @@ index dafa61a6b..84de8193f 100644
 +    invoke-virtual {p0, v7}, Lcom/android/server/audio/AudioDeviceBroker;->updateCommunicationRoute(Ljava/lang/String;)V
  
      return-void
- .end method
+ :cond_99
+    .end method
 diff --git a/smali/com/android/server/audio/BtHelper.smali b/smali/com/android/server/audio/BtHelper.smali
 index 5803f6ba9..096ddfa71 100644
 --- a/smali/com/android/server/audio/BtHelper.smali
@@ -742,7 +743,7 @@ index c8d23247c..51914c754 100644
  
      iget-object v3, p1, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->mSemHqmManager:Landroid/os/SemHqmManager;
  
--    if-eqz v3, :cond_c
+-    if-eqz v3, :cond_unica_unique
 +    if-eqz v3, :cond_9
  
      const-string v8, "0.0"
@@ -751,7 +752,7 @@ index c8d23247c..51914c754 100644
  
      invoke-virtual/range {v3 .. v12}, Landroid/os/SemHqmManager;->sendHWParamToHQM(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z
  
--    :cond_c
+-    :cond_unica_unique
 +    :cond_9
      :goto_5
      iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mHqmLoggingData:Lcom/samsung/android/server/vibrator/VibratorHqmData;
@@ -805,7 +806,7 @@ index c8d23247c..51914c754 100644
      iget-object p2, p2, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
  
 -    if-eqz p2, :cond_f
-+    if-eqz p2, :cond_c
++    if-eqz p2, :cond_unica_unique
  
      invoke-interface {p2}, Lcom/android/server/vibrator/VibrationSession;->getCallerInfo()Lcom/android/server/vibrator/VibrationSession$CallerInfo;
  
@@ -814,7 +815,7 @@ index c8d23247c..51914c754 100644
      move-result v1
  
 -    if-eqz v1, :cond_f
-+    if-eqz v1, :cond_c
++    if-eqz v1, :cond_unica_unique
  
      invoke-interface {p2}, Lcom/android/server/vibrator/VibrationSession;->getCallerInfo()Lcom/android/server/vibrator/VibrationSession$CallerInfo;
  
@@ -823,7 +824,7 @@ index c8d23247c..51914c754 100644
      const/16 v1, 0x21
  
 -    if-ne p2, v1, :cond_f
-+    if-ne p2, v1, :cond_c
++    if-ne p2, v1, :cond_unica_unique
  
      new-instance p2, Ljava/lang/StringBuilder;
  
@@ -832,7 +833,7 @@ index c8d23247c..51914c754 100644
      goto :goto_7
  
 -    :cond_f
-+    :cond_c
++    :cond_unica_unique
      const/4 p2, 0x0
  
      :goto_7
@@ -1356,7 +1357,7 @@ index a1602e347..eb2029fab 100644
 -    move-result v6
 +    move-result v5
  
--    if-eqz v6, :cond_c
+-    if-eqz v6, :cond_unica_unique
 +    if-eqz v5, :cond_b
  
 -    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
@@ -1374,7 +1375,7 @@ index a1602e347..eb2029fab 100644
  
      goto/16 :goto_5
  
--    :cond_c
+-    :cond_unica_unique
 +    :cond_b
      :goto_2
 -    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
@@ -1467,14 +1468,14 @@ index a1602e347..eb2029fab 100644
 +    move-result v6
  
 -    invoke-static {v5, v0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$msetAchMagnitude(Lcom/android/server/vibrator/VibratorManagerService;Lcom/android/server/vibrator/ExternalVibrationSession;)V
-+    if-eqz v6, :cond_c
++    if-eqz v6, :cond_unica_unique
  
 -    :cond_e
 -    iget-object v5, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
 +    iput v4, v5, Lcom/android/server/vibrator/VibrationStats;->mAdaptiveScale:F
  
 -    iget v5, v5, Landroid/os/ExternalVibrationScale;->scaleLevel:I
-+    :cond_c
++    :cond_unica_unique
 +    sget-boolean v4, Lcom/samsung/android/vibrator/VibRune;->SUPPORT_ACH:Z
  
 -    if-eq v5, v4, :cond_f
@@ -1754,7 +1755,7 @@ index a6e515736..88f031e71 100644
      iget-object v1, v5, Lcom/android/server/vibrator/Vibration$EndInfo;->endedBy:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
  
      :cond_9
--    if-nez v8, :cond_c
+-    if-nez v8, :cond_unica_unique
 +    if-nez v8, :cond_b
  
      invoke-static {}, Landroid/os/Binder;->clearCallingIdentity()J
@@ -1784,16 +1785,16 @@ index a6e515736..88f031e71 100644
  
      throw v0
  
--    :cond_c
+-    :cond_unica_unique
 +    :cond_b
      :goto_5
 -    if-eqz v8, :cond_d
-+    if-eqz v8, :cond_c
++    if-eqz v8, :cond_unica_unique
  
      invoke-virtual {v0, v7, v8, v1}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
  
 -    :cond_d
-+    :cond_c
++    :cond_unica_unique
      monitor-exit v3
  
      return-object v7
@@ -1897,7 +1898,8 @@ index ea1204dd1..781c64385 100644
 +++ b/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali
 @@ -247,74 +247,6 @@
      return-void
- .end method
+ :cond_99
+    .end method
  
 -.method public static isSamsungWatch(Landroid/bluetooth/BluetoothDevice;Landroid/bluetooth/BluetoothHeadset;)Z
 -    .locals 2
@@ -1965,7 +1967,8 @@ index ea1204dd1..781c64385 100644
 -    :cond_5
 -    :goto_3
 -    return v1
--.end method
+-:cond_99
+    .end method
 -
  .method public static sendAuracastAppListToNative(ILjava/lang/String;)V
      .locals 2

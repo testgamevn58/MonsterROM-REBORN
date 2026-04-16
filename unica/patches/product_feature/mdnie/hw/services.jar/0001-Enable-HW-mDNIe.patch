@@ -1,0 +1,33 @@
+From 890b1cce2cd02a44060ea3a53823880c29f206a9 Mon Sep 17 00:00:00 2001
+From: ExtremeXT <75576145+ExtremeXT@users.noreply.github.com>
+Date: Tue, 16 Sep 2025 20:59:45 +0300
+Subject: [PATCH] Enable HW mDNIe
+
+Change-Id: I2945c57aaf9e663469500d624915e1af8c1c090c
+Signed-off-by: ExtremeXT <75576145+ExtremeXT@users.noreply.github.com>
+---
+ .../AccessibilityManagerService$2.smali       | 133 ++-
+ .../AccessibilityManagerService.smali         | 266 ++++-
+ .../EyeComfortSolutionService.smali           | 531 +++++-----
+ .../MdnieScenarioControlService.smali         |   2 +-
+ ...MdnieManagerService$SettingsObserver.smali | 184 +++-
+ .../display/SemMdnieManagerService.smali      | 920 ++++++++++++++++--
+ .../custom/KnoxCustomManagerService.smali     | 202 +++-
+ 7 files changed, 1814 insertions(+), 424 deletions(-)
+
+diff --git a/smali_classes2/com/samsung/android/knox/custom/KnoxCustomManagerService.smali b/smali_classes2/com/samsung/android/knox/custom/KnoxCustomManagerService.smali
+--- a/smali_classes2/com/samsung/android/knox/custom/KnoxCustomManagerService.smali
++++ b/smali_classes2/com/samsung/android/knox/custom/KnoxCustomManagerService.smali
+@@ -647,7 +647,7 @@
+ 
+     iput-object v3, p0, Lcom/samsung/android/knox/custom/KnoxCustomManagerService;->mHardKeyReportList:Ljava/util/ArrayList;
+ 
+-    const-string/jumbo v1, "ro.product.model"
++    const-string/jumbo v1, "ro.product.vendor.model"
+ 
+     const-string/jumbo v5, "Unknown"
+ 
+
+-- 
+2.43.0
+# UN1CA-DNA-SPLICED

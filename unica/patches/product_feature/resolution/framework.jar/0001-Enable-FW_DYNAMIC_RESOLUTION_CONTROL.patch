@@ -7,31 +7,13 @@ Subject: [PATCH] Enable FW_DYNAMIC_RESOLUTION_CONTROL
  smali_classes6/com/samsung/android/rune/CoreRune.smali | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/smali_classes6/com/samsung/android/rune/CoreRune.smali b/smali_classes6/com/samsung/android/rune/CoreRune.smali
-index 3619eba0..67f62e17 100644
---- a/smali_classes6/com/samsung/android/rune/CoreRune.smali
-+++ b/smali_classes6/com/samsung/android/rune/CoreRune.smali
-@@ -2839,7 +2839,7 @@
- 
-     sput-boolean v5, Lcom/samsung/android/rune/CoreRune;->FW_MULTI_RESOLUTION_POLICY:Z
- 
--    sput-boolean v5, Lcom/samsung/android/rune/CoreRune;->FW_DYNAMIC_RESOLUTION_CONTROL:Z
-+    sput-boolean v4, Lcom/samsung/android/rune/CoreRune;->FW_DYNAMIC_RESOLUTION_CONTROL:Z
- 
-     const-string v2, "2"
- 
-@@ -2915,9 +2915,9 @@
- 
-     sput-boolean v3, Lcom/samsung/android/rune/CoreRune;->FW_VRR_REFRESH_RATE_MODE:Z
- 
--    sput-boolean v5, Lcom/samsung/android/rune/CoreRune;->FW_VRR_RESOLUTION_POLICY:Z
-+    sput-boolean v3, Lcom/samsung/android/rune/CoreRune;->FW_VRR_RESOLUTION_POLICY:Z
- 
--    sput-boolean v5, Lcom/samsung/android/rune/CoreRune;->FW_VRR_RESOLUTION_POLICY_FOR_SHELL_TRANSITION:Z
-+    sput-boolean v3, Lcom/samsung/android/rune/CoreRune;->FW_VRR_RESOLUTION_POLICY_FOR_SHELL_TRANSITION:Z
- 
-     sput-boolean v3, Lcom/samsung/android/rune/CoreRune;->FW_VRR_FIXED_REFRESH_RATE_PACKAGE:Z
- 
+diff --git a/smali_classes2/android/location/Location-IA.smali b/smali_classes2/android/location/Location-IA.smali
+--- a/smali_classes2/android/location/Location-IA.smali
++++ b/smali_classes2/android/location/Location-IA.smali
+@@ -1,3 +1,3 @@
+ .class public final synthetic Landroid/location/Location-IA;
+-.super Ljava/lang/Object;
++.super Ljava/lang/Object;
+ .source "D8$$SyntheticClass"
 -- 
-2.52.0
-
+2.43.0

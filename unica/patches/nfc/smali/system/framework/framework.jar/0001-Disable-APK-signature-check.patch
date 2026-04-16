@@ -1,0 +1,32 @@
+From 6c4f13c730b41af374db76ae04e9aa5e457f3041 Mon Sep 17 00:00:00 2001
+From: OmniSentry <bot@monster.rom>
+Date: Wed, 1 Apr 2026 20:26:53 +0200
+Subject: [PATCH] 0001-Disable-APK-signature-check
+
+---
+ .../android/util/apk/ApkSignatureVerifier.smali          | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/smali_classes4/android/util/apk/ApkSignatureVerifier.smali b/smali_classes4/android/util/apk/ApkSignatureVerifier.smali
+index 51cd097..f7e0d8e 100644
+--- a/smali_classes4/android/util/apk/ApkSignatureVerifier.smali
++++ b/smali_classes4/android/util/apk/ApkSignatureVerifier.smali
+@@ -193,15 +193,6 @@
+ .method public static blacklist getMinimumSignatureSchemeVersionForTargetSdk(I)I
+     .locals 1
+ 
+-    const/16 v0, 0x1e
+-
+-    if-lt p0, v0, :cond_0
+-
+-    const/4 p0, 0x2
+-
+-    return p0
+-
+-    :cond_0
+     const/4 p0, 0x1
+ 
+     return p0
+-- 
+2.43.0
+

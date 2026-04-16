@@ -1,0 +1,861 @@
+From 36daf947b2343d7bfbf01d83b9188e1df37c233b Mon Sep 17 00:00:00 2001
+From: ExtremeXT <75576145+ExtremeXT@users.noreply.github.com>
+Date: Fri, 19 Sep 2025 23:27:00 +0300
+Subject: [PATCH] Disable 5GHz Hotspot Country Check
+
+Change-Id: I2a6e58779100c59d045af52fe16e01bd7c3c723e
+Signed-off-by: ExtremeXT <75576145+ExtremeXT@users.noreply.github.com>
+---
+ .../server/wifi/ap/SemWifiApServiceImpl.smali | 88 +------------------
+ 1 file changed, 3 insertions(+), 85 deletions(-)
+
+diff --git a/smali/com/samsung/android/server/wifi/ap/SemWifiApServiceImpl.smali b/smali/com/samsung/android/server/wifi/ap/SemWifiApServiceImpl.smali
+index 0000000..1111111 100644
+--- a/smali/com/samsung/android/server/wifi/ap/SemWifiApServiceImpl.smali
++++ b/smali/com/samsung/android/server/wifi/ap/SemWifiApServiceImpl.smali
+@@ -13785,417 +13785,317 @@
+ .end method
+ 
+ .method public supportWifiAp5GBasedOnCountry()Z
+-    .locals 8
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceAccessPermission()V
+-
+-    sget-boolean v0, Lcom/samsung/android/wifi/SemWifiManager;->MHSDBG:Z
+-
+-    const/4 v1, 0x1
++    .locals 1
++
++    const/4 v0, 0x1
++
++    return v0
++.end method
++
++.method public supportWifiAp6GBasedOnCountry()Z
++    .locals 1
++
++    const/4 v0, 0x1
++
++    return v0
++.end method
++
++.method public supportWifiSharing()Z
++    .locals 0
++
++    const/4 p0, 0x0
++
++    return p0
++.end method
++
++.method public supportWifiSharingLite()Z
++    .locals 0
++
++    const/4 p0, 0x0
++
++    return p0
++.end method
++
++.method public unRegisterWifiApDataUsageCallback(I)V
++    .locals 3
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mHotspotMobileDataLimit:Lcom/samsung/android/server/wifi/ap/SemHotspotMobileDataLimit;
++
++    if-nez v0, :cond_0
++
++    return-void
++
++    :cond_0
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceNetworkSettingsPermission()V
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isVerboseLoggingEnabled()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_1
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mLog:Lcom/samsung/android/server/wifi/util/SemWifiLog;
++
++    const-string v1, "unRegisterWifiApDataUsageCallback uid=%"
++
++    invoke-interface {v0, v1}, Lcom/samsung/android/server/wifi/util/SemWifiLog;->info(Ljava/lang/String;)Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;
++
++    move-result-object v0
++
++    invoke-static {}, Landroid/os/Binder;->getCallingUid()I
++
++    move-result v1
++
++    int-to-long v1, v1
++
++    invoke-interface {v0, v1, v2}, Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;->c(J)Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;
++
++    move-result-object v0
++
++    invoke-interface {v0}, Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;->flush()V
++
++    :cond_1
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiThreadRunner()Lcom/samsung/android/server/wifi/SemWifiThreadRunner;
++
++    move-result-object v0
++
++    new-instance v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;
++
++    const/4 v2, 0x1
++
++    invoke-direct {v1, v2}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;-><init>(I)V
++
++    iput-object p0, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$0:Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;
++
++    iput p1, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$1:I
++
++    invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
++
++    invoke-virtual {v0, v1}, Lcom/samsung/android/server/wifi/SemWifiThreadRunner;->post(Ljava/lang/Runnable;)Z
++
++    return-void
++.end method
++
++.method public unregisterClientDataUsageCallback(I)V
++    .locals 3
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isSemWifiApDataUsageSupported()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_0
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiThreadRunner()Lcom/samsung/android/server/wifi/SemWifiThreadRunner;
++
++    move-result-object v0
++
++    new-instance v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;
++
++    const/4 v2, 0x2
++
++    invoke-direct {v1, v2}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;-><init>(I)V
++
++    iput-object p0, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$0:Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;
++
++    iput p1, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$1:I
++
++    invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
++
++    invoke-virtual {v0, v1}, Lcom/samsung/android/server/wifi/SemWifiThreadRunner;->post(Ljava/lang/Runnable;)Z
++
++    :cond_0
++    return-void
++.end method
++
++.method public unregisterClientListDataUsageCallback(I)V
++    .locals 3
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isSemWifiApDataUsageSupported()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_0
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiThreadRunner()Lcom/samsung/android/server/wifi/SemWifiThreadRunner;
++
++    move-result-object v0
++
++    new-instance v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;
+ 
+     const/4 v2, 0x0
+ 
++    invoke-direct {v1, v2}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;-><init>(I)V
++
++    iput-object p0, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$0:Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;
++
++    iput p1, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$1:I
++
++    invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
++
++    invoke-virtual {v0, v1}, Lcom/samsung/android/server/wifi/SemWifiThreadRunner;->post(Ljava/lang/Runnable;)Z
++
++    :cond_0
++    return-void
++.end method
++
++.method public unregisterWifiApSmartCallback(I)V
++    .locals 3
++
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceNetworkSettingsPermission()V
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isVerboseLoggingEnabled()Z
++
++    move-result v0
++
+     if-eqz v0, :cond_0
+ 
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mFacade:Lcom/samsung/android/server/wifi/SemFrameworkFacade;
+-
+-    const-string v3, "vendor.wifiap.5gbandcountry"
+-
+-    invoke-virtual {v0, v3, v2}, Lcom/samsung/android/server/wifi/SemFrameworkFacade;->getSystemProperties(Ljava/lang/String;I)I
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mLog:Lcom/samsung/android/server/wifi/util/SemWifiLog;
++
++    const-string v1, "unregisterWifiApSmartCallback uid=%"
++
++    invoke-interface {v0, v1}, Lcom/samsung/android/server/wifi/util/SemWifiLog;->info(Ljava/lang/String;)Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;
++
++    move-result-object v0
++
++    invoke-static {}, Landroid/os/Binder;->getCallingUid()I
++
++    move-result v1
++
++    int-to-long v1, v1
++
++    invoke-interface {v0, v1, v2}, Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;->c(J)Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;
++
++    move-result-object v0
++
++    invoke-interface {v0}, Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;->flush()V
++
++    :cond_0
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiThreadRunner()Lcom/samsung/android/server/wifi/SemWifiThreadRunner;
++
++    move-result-object v0
++
++    new-instance v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;
++
++    const/4 v2, 0x3
++
++    invoke-direct {v1, v2}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;-><init>(I)V
++
++    iput-object p0, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$0:Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;
++
++    iput p1, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$1:I
++
++    invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
++
++    invoke-virtual {v0, v1}, Lcom/samsung/android/server/wifi/SemWifiThreadRunner;->post(Ljava/lang/Runnable;)Z
++
++    return-void
++.end method
++
++.method public updateHostapdMacList(I)V
++    .locals 0
++
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceChangePermission()V
++
++    return-void
++.end method
++
++.method public wifiApBackUpClientDataUsageSettingsInfo()Ljava/lang/String;
++    .locals 1
++
++    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
++
++    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isSemWifiApDataUsageSupported()Z
+ 
+     move-result v0
+ 
+-    if-ne v0, v1, :cond_0
+-
+-    const-string p0, "SemWifiApServiceImpl"
+-
+-    const-string v0, "MHS vendor.wifiap.5gbandcountry is true"
+-
+-    invoke-static {p0, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+-
+-    return v1
++    if-eqz v0, :cond_0
++
++    iget-object p0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
++
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApDataUsage()Lcom/samsung/android/server/wifi/ap/datausage/SemWifiApDataUsage;
++
++    move-result-object p0
++
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/datausage/SemWifiApDataUsage;->backUpClientDataUsageSettingsInfo()Ljava/lang/String;
++
++    move-result-object p0
++
++    return-object p0
+ 
+     :cond_0
++    const/4 p0, 0x0
++
++    return-object p0
++.end method
++
++.method public wifiApBleClientRole(Z)Z
++    .locals 3
++
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceChangePermission()V
++
+     invoke-static {}, Landroid/os/Binder;->clearCallingIdentity()J
+ 
+-    move-result-wide v3
++    move-result-wide v0
+ 
+     :try_start_0
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mFacade:Lcom/samsung/android/server/wifi/SemFrameworkFacade;
+-
+-    iget-object v5, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mContext:Landroid/content/Context;
+-
+-    const-string v6, "wifi_ap_chip_support5g_baseon_country"
+-
+-    invoke-virtual {v0, v5, v6}, Lcom/samsung/android/server/wifi/SemFrameworkFacade;->getSecureStringSetting(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;
+-
+-    move-result-object v0
+-
+-    iget-object v5, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mFacade:Lcom/samsung/android/server/wifi/SemFrameworkFacade;
+-
+-    iget-object v6, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mContext:Landroid/content/Context;
+-
+-    const-string v7, "wifi_ap_chip_support5g"
+-
+-    invoke-virtual {v5, v6, v7}, Lcom/samsung/android/server/wifi/SemFrameworkFacade;->getSecureStringSetting(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;
+-
+-    move-result-object v5
+-
+-    if-eqz v0, :cond_3
+-
+-    const-string v6, "na"
+-
+-    invoke-virtual {v6, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-
+-    move-result v6
+-
+-    if-eqz v6, :cond_1
+-
+-    goto :goto_1
+-
+-    :cond_1
+-    invoke-static {v0}, Ljava/lang/Boolean;->parseBoolean(Ljava/lang/String;)Z
+-
+-    move-result v0
+-
+-    invoke-static {v5}, Ljava/lang/Boolean;->parseBoolean(Ljava/lang/String;)Z
+-
+-    move-result v5
+-
+-    if-eqz v5, :cond_2
+-
+-    if-eqz v0, :cond_2
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->isRegionFor5GCountry()Z
++    iget-object v2, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
++
++    invoke-virtual {v2}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartClient()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartClient;
++
++    move-result-object v2
++
++    if-eqz v2, :cond_0
++
++    iget-object p0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
++
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartClient()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartClient;
++
++    move-result-object p0
++
++    invoke-virtual {p0, p1}, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartClient;->setWifiApSmartClient(Z)Z
+ 
+     move-result p0
+     :try_end_0
+     .catchall {:try_start_0 .. :try_end_0} :catchall_0
+ 
+-    if-eqz p0, :cond_2
+-
+     goto :goto_0
+ 
+     :catchall_0
+     move-exception p0
+ 
+-    goto :goto_2
+-
+-    :cond_2
+-    move v1, v2
+-
+-    :goto_0
+-    move v2, v1
+-
+-    :cond_3
+-    :goto_1
+-    invoke-static {v3, v4}, Landroid/os/Binder;->restoreCallingIdentity(J)V
+-
+-    return v2
+-
+-    :goto_2
+-    invoke-static {v3, v4}, Landroid/os/Binder;->restoreCallingIdentity(J)V
+-
+-    throw p0
+-.end method
+-
+-.method public supportWifiAp6GBasedOnCountry()Z
+-    .locals 4
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceAccessPermission()V
+-
+-    sget-boolean v0, Lcom/samsung/android/wifi/SemWifiManager;->MHSDBG:Z
+-
+-    const/4 v1, 0x0
+-
+-    const/4 v2, 0x1
+-
+-    if-eqz v0, :cond_0
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mFacade:Lcom/samsung/android/server/wifi/SemFrameworkFacade;
+-
+-    const-string v3, "vendor.wifiap.6gbandcountry"
+-
+-    invoke-virtual {v0, v3, v1}, Lcom/samsung/android/server/wifi/SemFrameworkFacade;->getSystemProperties(Ljava/lang/String;I)I
+-
+-    move-result v0
+-
+-    if-ne v0, v2, :cond_0
+-
+-    const-string p0, "SemWifiApServiceImpl"
+-
+-    const-string v0, "MHS vendor.wifiap.6gbandcountry is true"
+-
+-    invoke-static {p0, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+-
+-    return v2
+-
+-    :cond_0
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mFacade:Lcom/samsung/android/server/wifi/SemFrameworkFacade;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemFrameworkFacade;->isSupportMobileAp6G()Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_1
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->isRegionFor6GCountry()Z
+-
+-    move-result p0
+-
+-    if-eqz p0, :cond_1
+-
+-    return v2
+-
+-    :cond_1
+-    return v1
+-.end method
+-
+-.method public supportWifiSharing()Z
+-    .locals 0
+-
+-    const/4 p0, 0x0
+-
+-    return p0
+-.end method
+-
+-.method public supportWifiSharingLite()Z
+-    .locals 0
+-
+-    const/4 p0, 0x0
+-
+-    return p0
+-.end method
+-
+-.method public unRegisterWifiApDataUsageCallback(I)V
+-    .locals 3
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mHotspotMobileDataLimit:Lcom/samsung/android/server/wifi/ap/SemHotspotMobileDataLimit;
+-
+-    if-nez v0, :cond_0
+-
+-    return-void
+-
+-    :cond_0
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceNetworkSettingsPermission()V
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isVerboseLoggingEnabled()Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_1
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mLog:Lcom/samsung/android/server/wifi/util/SemWifiLog;
+-
+-    const-string v1, "unRegisterWifiApDataUsageCallback uid=%"
+-
+-    invoke-interface {v0, v1}, Lcom/samsung/android/server/wifi/util/SemWifiLog;->info(Ljava/lang/String;)Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;
+-
+-    move-result-object v0
+-
+-    invoke-static {}, Landroid/os/Binder;->getCallingUid()I
+-
+-    move-result v1
+-
+-    int-to-long v1, v1
+-
+-    invoke-interface {v0, v1, v2}, Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;->c(J)Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;
+-
+-    move-result-object v0
+-
+-    invoke-interface {v0}, Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;->flush()V
+-
+-    :cond_1
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiThreadRunner()Lcom/samsung/android/server/wifi/SemWifiThreadRunner;
+-
+-    move-result-object v0
+-
+-    new-instance v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;
+-
+-    const/4 v2, 0x1
+-
+-    invoke-direct {v1, v2}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;-><init>(I)V
+-
+-    iput-object p0, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$0:Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;
+-
+-    iput p1, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$1:I
+-
+-    invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
+-
+-    invoke-virtual {v0, v1}, Lcom/samsung/android/server/wifi/SemWifiThreadRunner;->post(Ljava/lang/Runnable;)Z
+-
+-    return-void
+-.end method
+-
+-.method public unregisterClientDataUsageCallback(I)V
+-    .locals 3
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isSemWifiApDataUsageSupported()Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_0
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiThreadRunner()Lcom/samsung/android/server/wifi/SemWifiThreadRunner;
+-
+-    move-result-object v0
+-
+-    new-instance v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;
+-
+-    const/4 v2, 0x2
+-
+-    invoke-direct {v1, v2}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;-><init>(I)V
+-
+-    iput-object p0, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$0:Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;
+-
+-    iput p1, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$1:I
+-
+-    invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
+-
+-    invoke-virtual {v0, v1}, Lcom/samsung/android/server/wifi/SemWifiThreadRunner;->post(Ljava/lang/Runnable;)Z
+-
+-    :cond_0
+-    return-void
+-.end method
+-
+-.method public unregisterClientListDataUsageCallback(I)V
+-    .locals 3
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isSemWifiApDataUsageSupported()Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_0
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiThreadRunner()Lcom/samsung/android/server/wifi/SemWifiThreadRunner;
+-
+-    move-result-object v0
+-
+-    new-instance v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;
+-
+-    const/4 v2, 0x0
+-
+-    invoke-direct {v1, v2}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;-><init>(I)V
+-
+-    iput-object p0, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$0:Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;
+-
+-    iput p1, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$1:I
+-
+-    invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
+-
+-    invoke-virtual {v0, v1}, Lcom/samsung/android/server/wifi/SemWifiThreadRunner;->post(Ljava/lang/Runnable;)Z
+-
+-    :cond_0
+-    return-void
+-.end method
+-
+-.method public unregisterWifiApSmartCallback(I)V
+-    .locals 3
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceNetworkSettingsPermission()V
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isVerboseLoggingEnabled()Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_0
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mLog:Lcom/samsung/android/server/wifi/util/SemWifiLog;
+-
+-    const-string v1, "unregisterWifiApSmartCallback uid=%"
+-
+-    invoke-interface {v0, v1}, Lcom/samsung/android/server/wifi/util/SemWifiLog;->info(Ljava/lang/String;)Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;
+-
+-    move-result-object v0
+-
+-    invoke-static {}, Landroid/os/Binder;->getCallingUid()I
+-
+-    move-result v1
+-
+-    int-to-long v1, v1
+-
+-    invoke-interface {v0, v1, v2}, Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;->c(J)Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;
+-
+-    move-result-object v0
+-
+-    invoke-interface {v0}, Lcom/samsung/android/server/wifi/util/SemWifiLog$LogMessage;->flush()V
+-
+-    :cond_0
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiThreadRunner()Lcom/samsung/android/server/wifi/SemWifiThreadRunner;
+-
+-    move-result-object v0
+-
+-    new-instance v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;
+-
+-    const/4 v2, 0x3
+-
+-    invoke-direct {v1, v2}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;-><init>(I)V
+-
+-    iput-object p0, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$0:Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;
+-
+-    iput p1, v1, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl$$ExternalSyntheticLambda7;->f$1:I
+-
+-    invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
+-
+-    invoke-virtual {v0, v1}, Lcom/samsung/android/server/wifi/SemWifiThreadRunner;->post(Ljava/lang/Runnable;)Z
+-
+-    return-void
+-.end method
+-
+-.method public updateHostapdMacList(I)V
+-    .locals 0
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceChangePermission()V
+-
+-    return-void
+-.end method
+-
+-.method public wifiApBackUpClientDataUsageSettingsInfo()Ljava/lang/String;
+-    .locals 1
+-
+-    iget-object v0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mWifiManagerProxy:Lcom/samsung/android/server/wifi/SemWifiManagerProxy;
+-
+-    invoke-virtual {v0}, Lcom/samsung/android/server/wifi/SemWifiManagerProxy;->isSemWifiApDataUsageSupported()Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_0
+-
+-    iget-object p0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApDataUsage()Lcom/samsung/android/server/wifi/ap/datausage/SemWifiApDataUsage;
+-
+-    move-result-object p0
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/datausage/SemWifiApDataUsage;->backUpClientDataUsageSettingsInfo()Ljava/lang/String;
+-
+-    move-result-object p0
+-
+-    return-object p0
++    goto :goto_1
+ 
+     :cond_0
+     const/4 p0, 0x0
+ 
+-    return-object p0
+-.end method
+-
+-.method public wifiApBleClientRole(Z)Z
++    :goto_0
++    invoke-static {v0, v1}, Landroid/os/Binder;->restoreCallingIdentity(J)V
++
++    return p0
++
++    :goto_1
++    invoke-static {v0, v1}, Landroid/os/Binder;->restoreCallingIdentity(J)V
++
++    throw p0
++.end method
++
++.method public wifiApBleD2DClientRole(Z)Z
+     .locals 3
+ 
+     invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceChangePermission()V
+@@ -14207,7 +14107,7 @@
+     :try_start_0
+     iget-object v2, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+ 
+-    invoke-virtual {v2}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartClient()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartClient;
++    invoke-virtual {v2}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartD2DClient()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DClient;
+ 
+     move-result-object v2
+ 
+@@ -14215,11 +14115,11 @@
+ 
+     iget-object p0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+ 
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartClient()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartClient;
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartD2DClient()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DClient;
+ 
+     move-result-object p0
+ 
+-    invoke-virtual {p0, p1}, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartClient;->setWifiApSmartClient(Z)Z
++    invoke-virtual {p0, p1}, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DClient;->wifiApBleD2DClientRole(Z)Z
+ 
+     move-result p0
+     :try_end_0
+@@ -14246,7 +14146,7 @@
+     throw p0
+ .end method
+ 
+-.method public wifiApBleD2DClientRole(Z)Z
++.method public wifiApBleD2DMhsRole(Z)Z
+     .locals 3
+ 
+     invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceChangePermission()V
+@@ -14258,7 +14158,7 @@
+     :try_start_0
+     iget-object v2, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+ 
+-    invoke-virtual {v2}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartD2DClient()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DClient;
++    invoke-virtual {v2}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartD2DMHS()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DMHS;
+ 
+     move-result-object v2
+ 
+@@ -14266,11 +14166,11 @@
+ 
+     iget-object p0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+ 
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartD2DClient()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DClient;
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartD2DMHS()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DMHS;
+ 
+     move-result-object p0
+ 
+-    invoke-virtual {p0, p1}, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DClient;->wifiApBleD2DClientRole(Z)Z
++    invoke-virtual {p0, p1}, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DMHS;->wifiApBleD2DMhsRole(Z)Z
+ 
+     move-result p0
+     :try_end_0
+@@ -14297,7 +14197,7 @@
+     throw p0
+ .end method
+ 
+-.method public wifiApBleD2DMhsRole(Z)Z
++.method public wifiApBleMhsRole(Z)Z
+     .locals 3
+ 
+     invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceChangePermission()V
+@@ -14309,7 +14209,7 @@
+     :try_start_0
+     iget-object v2, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+ 
+-    invoke-virtual {v2}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartD2DMHS()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DMHS;
++    invoke-virtual {v2}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartMHS()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartMHS;
+ 
+     move-result-object v2
+ 
+@@ -14317,11 +14217,11 @@
+ 
+     iget-object p0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+ 
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartD2DMHS()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DMHS;
++    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartMHS()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartMHS;
+ 
+     move-result-object p0
+ 
+-    invoke-virtual {p0, p1}, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartD2DMHS;->wifiApBleD2DMhsRole(Z)Z
++    invoke-virtual {p0, p1}, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartMHS;->setWifiApSmartMHS(Z)Z
+ 
+     move-result p0
+     :try_end_0
+@@ -14348,57 +14248,6 @@
+     throw p0
+ .end method
+ 
+-.method public wifiApBleMhsRole(Z)Z
+-    .locals 3
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->enforceChangePermission()V
+-
+-    invoke-static {}, Landroid/os/Binder;->clearCallingIdentity()J
+-
+-    move-result-wide v0
+-
+-    :try_start_0
+-    iget-object v2, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+-
+-    invoke-virtual {v2}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartMHS()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartMHS;
+-
+-    move-result-object v2
+-
+-    if-eqz v2, :cond_0
+-
+-    iget-object p0, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApServiceImpl;->mSemWifiInjector:Lcom/samsung/android/server/wifi/SemWifiInjector;
+-
+-    invoke-virtual {p0}, Lcom/samsung/android/server/wifi/SemWifiInjector;->getWifiApSmartMHS()Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartMHS;
+-
+-    move-result-object p0
+-
+-    invoke-virtual {p0, p1}, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartMHS;->setWifiApSmartMHS(Z)Z
+-
+-    move-result p0
+-    :try_end_0
+-    .catchall {:try_start_0 .. :try_end_0} :catchall_0
+-
+-    goto :goto_0
+-
+-    :catchall_0
+-    move-exception p0
+-
+-    goto :goto_1
+-
+-    :cond_0
+-    const/4 p0, 0x0
+-
+-    :goto_0
+-    invoke-static {v0, v1}, Landroid/os/Binder;->restoreCallingIdentity(J)V
+-
+-    return p0
+-
+-    :goto_1
+-    invoke-static {v0, v1}, Landroid/os/Binder;->restoreCallingIdentity(J)V
+-
+-    throw p0
+-.end method
+-
+ .method public wifiApDisassocSta(Ljava/lang/String;)V
+     .locals 1
+ 

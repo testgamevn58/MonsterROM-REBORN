@@ -1,4 +1,4 @@
 id=nfc
-name=NFC patches
-author=salvogiangri
-description=Applies NFC patches in work dir.
+name=Stock NFC blobs
+author=ExtremeXT, dupazlasu
+description=Replaces source NFC blobs with target ones if necessary.

@@ -1,21 +1,22 @@
-From 593ca190c98657a043dc0b4de97c26a89235de49 Mon Sep 17 00:00:00 2001
-From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Sat, 11 Oct 2025 02:07:54 +0200
+From 91cf366ab58c46c90b19029beb94463bd817ce65 Mon Sep 17 00:00:00 2001
+From: ExtremeXT <75576145+ExtremeXT@users.noreply.github.com>
+Date: Fri, 12 Sep 2025 23:46:04 +0200
 Subject: [PATCH] Remove brightness threshold values
 
+Signed-off-by: dupazlasu <dupazlasu66@gmail.com>
 ---
  .../android/hardware/display/RefreshRateConfig.smali | 12 +++++-------
  1 file changed, 5 insertions(+), 7 deletions(-)
 
 diff --git a/smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali b/smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali
-index 7d9182d5..c4340ef7 100644
+index de015f8a..4606043e 100644
 --- a/smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali
 +++ b/smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali
 @@ -386,7 +386,7 @@
  
      invoke-virtual {p2, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
  
--    const-string v0, "SEAMLESS_BRT: 84,85"
+-    const-string v0, "SEAMLESS_BRT: 89,91"
 +    const-string v0, "SEAMLESS_BRT: "
  
      invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -24,7 +25,7 @@ index 7d9182d5..c4340ef7 100644
  
      invoke-virtual {p2, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
  
--    const-string v0, "SEAMLESS_LUX: 200,1500"
+-    const-string v0, "SEAMLESS_LUX: 260,2500"
 +    const-string v0, "SEAMLESS_LUX: "
  
      invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -42,9 +43,9 @@ index 7d9182d5..c4340ef7 100644
  
      const-string/jumbo v2, "persist.dm.passive.ambient_brightness"
  
--    const-string v3, "84,85"
+-    const-string v3, "89,91"
 -
--    const-string v4, "200,1500"
+-    const-string v4, "260,2500"
 +    const-string v3, ""
  
 -    invoke-direct {v0, v3, v4, v1, v2}, Lcom/samsung/android/hardware/display/RefreshRateConfig$BrightnessThreshold;-><init>(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V

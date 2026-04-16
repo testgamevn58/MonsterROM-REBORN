@@ -8,39 +8,17 @@ Subject: [PATCH] Disable LOWLATENCY support
  1 file changed, 1 insertion(+), 15 deletions(-)
 
 diff --git a/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali b/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali
-index 42f5e55..8183d47 100644
 --- a/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali
 +++ b/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali
-@@ -145,7 +145,7 @@
- .end method
+@@ -487,7 +487,7 @@
+ :cond_99
+    .end method
  
- .method private configDefaultFeatureSet()V
+ .method public getStdPlusFeature()J
 -    .locals 4
 +    .locals 3
  
-     iget-object v0, p0, Lcom/samsung/android/server/wifi/driver/WifiDriverFeatureProvider;->mSwFeatureInteger:Ljava/util/HashMap;
+     const/4 v0, 0x0
  
-@@ -159,20 +159,6 @@
- 
-     invoke-static {v2}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
- 
--    move-result-object v3
--
--    invoke-virtual {v0, v1, v3}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
--
--    iget-object v0, p0, Lcom/samsung/android/server/wifi/driver/WifiDriverFeatureProvider;->mSwFeatureInteger:Ljava/util/HashMap;
--
--    const/4 v1, 0x3
--
--    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
--
--    move-result-object v1
--
--    invoke-static {v2}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
--
-     move-result-object v2
- 
-     invoke-virtual {v0, v1, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 -- 
-2.51.0
-
+2.43.0

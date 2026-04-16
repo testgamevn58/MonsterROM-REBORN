@@ -1,0 +1,6 @@
+system 0 0 755 capabilities=0x0
+system/etc/libnfc.nci.conf 0 0 644 capabilities=0x0
+system/lib64 0 0 755 capabilities=0x0
+system/lib64/libnfc_nci_jni.so 0 0 644 capabilities=0x0
+system/lib64/libnfc_prop_extn.so 0 0 644 capabilities=0x0
+system/lib64/libnfc_vendor_extn.so 0 0 644 capabilities=0x0

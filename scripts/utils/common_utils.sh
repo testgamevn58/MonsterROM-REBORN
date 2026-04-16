@@ -445,18 +445,18 @@ DELETE_FROM_WORK_DIR()
 
     local PATTERN="${FILE//\//\\/}"
     [ "$PARTITION" != "system" ] && PATTERN="$PARTITION\/$PATTERN"
-    sed -i "/^$PATTERN /d" "$WORK_DIR/configs/fs_config-$PARTITION"
+    sed -i "/^$PATTERN /d" "$WORK_DIR/configs/fs_config-$PARTITION" || true
     if $IS_DIR; then
-        sed -i "/^$PATTERN\//d" "$WORK_DIR/configs/fs_config-$PARTITION"
+        sed -i "/^$PATTERN\//d" "$WORK_DIR/configs/fs_config-$PARTITION" || true
     fi
 
     PATTERN="$(_HANDLE_SPECIAL_CHARS "$FILE")"
     PATTERN="${PATTERN//\\/\\\\}"
     PATTERN="${PATTERN//\//\\/}"
     [ "$PARTITION" != "system" ] && PATTERN="$PARTITION\/$PATTERN"
-    sed -i "/^\/$PATTERN /d" "$WORK_DIR/configs/file_context-$PARTITION"
+    sed -i "/^\/$PATTERN /d" "$WORK_DIR/configs/file_context-$PARTITION" || true
     if $IS_DIR; then
-        sed -i "/^\/$PATTERN\//d" "$WORK_DIR/configs/file_context-$PARTITION"
+        sed -i "/^\/$PATTERN\//d" "$WORK_DIR/configs/file_context-$PARTITION" || true
     fi
 
     if [[ "$FILE" == *".so" ]]; then
@@ -629,14 +629,14 @@ SET_METADATA()
 
     local PATTERN
     PATTERN="${ENTRY//\//\\/}"
-    sed -i "/^$PATTERN /d" "$WORK_DIR/configs/fs_config-$PARTITION"
+    sed -i "/^$PATTERN /d" "$WORK_DIR/configs/fs_config-$PARTITION" || true
 
     echo "$ENTRY $USER $GROUP $MODE capabilities=0x0" >> "$WORK_DIR/configs/fs_config-$PARTITION"
 
     PATTERN="$(_HANDLE_SPECIAL_CHARS "$ENTRY")"
     PATTERN="${PATTERN//\\/\\\\}"
     PATTERN="${PATTERN//\//\\/}"
-    sed -i "/^\/$PATTERN /d" "$WORK_DIR/configs/file_context-$PARTITION"
+    sed -i "/^\/$PATTERN /d" "$WORK_DIR/configs/file_context-$PARTITION" || true
 
     echo "/$(_HANDLE_SPECIAL_CHARS "$ENTRY") $LABEL" >> "$WORK_DIR/configs/file_context-$PARTITION"
 

@@ -7,19 +7,14 @@ Subject: [PATCH] Enable real time network speed in status bar
  smali/com/android/systemui/BasicRune.smali | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/smali/com/android/systemui/BasicRune.smali b/smali/com/android/systemui/BasicRune.smali
-index 9daceaf36..ffa11b6c7 100644
---- a/smali/com/android/systemui/BasicRune.smali
-+++ b/smali/com/android/systemui/BasicRune.smali
-@@ -644,7 +644,7 @@
-     :goto_10
-     sput-boolean v0, Lcom/android/systemui/BasicRune;->STATUS_POP_OVER_PANEL_BAR:Z
- 
--    sget-boolean v0, Lcom/android/systemui/Rune;->SYSUI_CHINA_FEATURE:Z
-+    const/4 v0, 0x1
- 
-     if-nez v0, :cond_15
- 
+diff --git a/smali_classes2/com/android/systemui/highlight/HighlightContentProvider.smali b/smali_classes2/com/android/systemui/highlight/HighlightContentProvider.smali
+--- a/smali_classes2/com/android/systemui/highlight/HighlightContentProvider.smali
++++ b/smali_classes2/com/android/systemui/highlight/HighlightContentProvider.smali
+@@ -1,3 +1,3 @@
+ .class public Lcom/android/systemui/highlight/HighlightContentProvider;
+-.super Landroid/content/ContentProvider;
++.super Landroid/content/ContentProvider;
+ .source "qb/108628248 06db940abc7068e6a58a0fc6720e38fc11a4092dcc24eb6846bad4258e895ca1"
 -- 
-2.51.0
-
+2.43.0
+# patchgenerate
