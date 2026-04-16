@@ -148,9 +148,9 @@ if $BUILD_ROM; then
     echo -n "$(GET_WORK_DIR_HASH)" > "$WORK_DIR/.completed"
 fi
 
-if $BUILD_ZIP; then
-    LOG_STEP_IN true "Creating zip"
-    "$SRC_DIR/scripts/internal/build_flashable_zip.sh" || exit 1
+if $BUILD_TAR; then
+    LOG_STEP_IN true "Creating tar"
+    "$SRC_DIR/scripts/internal/build_odin_package.sh" || exit 1
     LOG_STEP_OUT
 fi
 

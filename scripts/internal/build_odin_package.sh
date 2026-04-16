@@ -17,6 +17,7 @@
 #
 
 set -Eeuo pipefail
+: "${TARGET_OS_FILE_SYSTEM:=erofs}"
 
 # [
 GENERATE_LPMAKE_OPT()
@@ -30,6 +31,8 @@ GENERATE_LPMAKE_OPT()
     local HAS_VENDOR_DLKM=false
     local HAS_ODM_DLKM=false
     local HAS_SYSTEM_DLKM=false
+    local TARGET_SUPER_GROUP_SIZE_VAR="TARGET_${TARGET_SUPER_GROUP_NAME^^}_SIZE"
+    local TARGET_SUPER_GROUP_SIZE="${!TARGET_SUPER_GROUP_SIZE_VAR}"
 
     [ -f "$TMP_DIR/system.img" ] && HAS_SYSTEM=true
     [ -f "$TMP_DIR/vendor.img" ] && HAS_VENDOR=true
