@@ -186,16 +186,16 @@ fi
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 if [ "$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/build.prop" "ro.build.version.oneui")" -lt "50101" ]; then
     PATCHED=true
-    DELETE_FROM_WORK_DIR "system" "system/bin/fabric_crypto" || true
-    DELETE_FROM_WORK_DIR "system" "system/etc/init/fabric_crypto.rc" || true
-    DELETE_FROM_WORK_DIR "system" "system/etc/permissions/FabricCryptoLib.xml" || true
-    DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.kmxservice.xml" || true
-    DELETE_FROM_WORK_DIR "system" "system/etc/vintf/manifest/fabric_crypto_manifest.xml" || true
-    DELETE_FROM_WORK_DIR "system" "system/framework/FabricCryptoLib.jar" || true
-    DELETE_FROM_WORK_DIR "system" "system/lib64/com.samsung.security.fabric.cryptod-V1-cpp.so" || true
-    DELETE_FROM_WORK_DIR "system" "system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-cpp.so" || true
-    DELETE_FROM_WORK_DIR "system" "system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-ndk.so" || true
-    DELETE_FROM_WORK_DIR "system" "system/priv-app/KmxService" || true
+    DELETE_FROM_WORK_DIR "system" "system/bin/fabric_crypto"
+    DELETE_FROM_WORK_DIR "system" "system/etc/init/fabric_crypto.rc"
+    DELETE_FROM_WORK_DIR "system" "system/etc/permissions/FabricCryptoLib.xml"
+    DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.kmxservice.xml"
+    DELETE_FROM_WORK_DIR "system" "system/etc/vintf/manifest/fabric_crypto_manifest.xml"
+    DELETE_FROM_WORK_DIR "system" "system/framework/FabricCryptoLib.jar"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/com.samsung.security.fabric.cryptod-V1-cpp.so"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-cpp.so"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-ndk.so"
+    DELETE_FROM_WORK_DIR "system" "system/priv-app/KmxService"
 fi
 
 # Ensure KSMBD support in kernel
@@ -206,30 +206,17 @@ if [ -f "$WORK_DIR/system/system/priv-app/StorageShare/StorageShare.apk" ]; then
     EXTRACT_KERNEL_IMAGE
     if ! grep -q "ksmbd" "$TMP_DIR/out/kernel"; then
         PATCHED=true
-        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.addshare" || true
-        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.adduser" || true
-        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.control" || true
-        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.mountd" || true
-        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.tools" || true
-        DELETE_FROM_WORK_DIR "system" "system/etc/default-permissions/default-permissions-com.samsung.android.hwresourceshare.storage.xml" || true
-        DELETE_FROM_WORK_DIR "system" "system/etc/init/ksmbd.rc" || true
-        DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.hwresourceshare.storage.xml" || true
-        DELETE_FROM_WORK_DIR "system" "system/etc/sysconfig/preinstalled-packages-com.samsung.android.hwresourceshare.storage.xml" || true
-        DELETE_FROM_WORK_DIR "system" "system/etc/ksmbd.conf" || true
-        DELETE_FROM_WORK_DIR "system" "system/priv-app/StorageShare" || true
-    fi
-fi
-
-# Ensure Sem eBPF Smart Hotspot functionality (pre-API 35)
-# - Check for TARGET_PLATFORM_SDK_VERSION < 35 as 4.14 kernel support has been deprecated in Android V
-# - Disable "ro.kernel.version" == "4.14" leftover checks, 4.14 needs eBPF kernel backports anyway
-if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
-    EXTRACT_KERNEL_IMAGE
-    if grep -q "Linux version 4.14" "$TMP_DIR/out/kernel"; then
-        PATCHED=true
-        # [b.eq #0xXXXXXX] -> [nop]
-        HEX_PATCH "$WORK_DIR/system/system/bin/netd" "e001005480feff90" "1f2003d580feff90"
-        HEX_PATCH "$WORK_DIR/system/system/bin/netd" "2001005480feff90" "1f2003d580feff90"
+        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.addshare"
+        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.adduser"
+        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.control"
+        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.mountd"
+        DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.tools"
+        DELETE_FROM_WORK_DIR "system" "system/etc/default-permissions/default-permissions-com.samsung.android.hwresourceshare.storage.xml"
+        DELETE_FROM_WORK_DIR "system" "system/etc/init/ksmbd.rc"
+        DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.hwresourceshare.storage.xml"
+        DELETE_FROM_WORK_DIR "system" "system/etc/sysconfig/preinstalled-packages-com.samsung.android.hwresourceshare.storage.xml"
+        DELETE_FROM_WORK_DIR "system" "system/etc/ksmbd.conf"
+        DELETE_FROM_WORK_DIR "system" "system/priv-app/StorageShare"
     fi
 fi
 
@@ -238,13 +225,13 @@ TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" 
 if [ -f "$WORK_DIR/system/system/bin/sbauth" ] && \
         [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/bin/sbauth" ]; then
     PATCHED=true
-    DELETE_FROM_WORK_DIR "system" "system/bin/sbauth" || true
-    DELETE_FROM_WORK_DIR "system" "system/etc/init/sbauth.rc" || true
+    DELETE_FROM_WORK_DIR "system" "system/bin/sbauth"
+    DELETE_FROM_WORK_DIR "system" "system/etc/init/sbauth.rc"
 fi
 
 # Ensure PASS support (pre-API 35)
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
-    if ! grep -q "sec_pass_data_file" "$WORK_DIR/vendor/etc/selinux/vendor_file_contexts"; then
+    if ! grep -q "sec_pass_data_file" "$WORK_DIR/vendor/etc/selinux/vendor_sepolicy.cil"; then
         PATCHED=true
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali/com/android/server/StorageManagerService.smali" "return" \
@@ -325,4 +312,3 @@ fi
 
 unset PATCHED TARGET_FIRMWARE_PATH
 unset -f BACKPORT_SF_PROPS EXTRACT_KERNEL_IMAGE EXTRACT_KERNEL_MODULES
-

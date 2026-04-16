@@ -176,6 +176,11 @@ system/etc/sysconfig/preinstalled-packages-com.mygalaxy.service.xml
 system/priv-app/MyGalaxyService
 "
 
+# Phoneconfiguration
+SYSTEM_DEBLOAT+="
+system/priv-app/CIDManager
+"
+
 # Samsung Analytics
 SYSTEM_DEBLOAT+="
 system/app/DsmsAPK

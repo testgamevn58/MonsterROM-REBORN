@@ -149,9 +149,6 @@ fi
 #   TARGET_VENDOR_BOOT_PARTITION_SIZE
 #     Integer containing the size in bytes of the target device vendor_boot partition size.
 #
-#   TARGET_CACHE_PARTITION_SIZE
-#     Integer containing the size in bytes of the target device cache partition size.
-#
 #   TARGET_SUPER_PARTITION_SIZE
 #     Integer containing the size in bytes of the target device super partition size, which can be checked using the lpdump tool.
 #     Notice this must be bigger than TARGET_${TARGET_SUPER_GROUP_NAME}_SIZE.
@@ -444,12 +441,12 @@ fi
     GET_BUILD_VAR "TARGET_BOARD_API_LEVEL"
     GET_BUILD_VAR "TARGET_DISABLE_AVB_SIGNING" "false"
     GET_BUILD_VAR "TARGET_INCLUDE_PATCHED_VBMETA" "false"
+    GET_BUILD_VAR "TARGET_INSTALL_METHOD" "odin"
     GET_BUILD_VAR "TARGET_KEEP_ORIGINAL_SIGN" "false"
     GET_BUILD_VAR "TARGET_BOOT_PARTITION_SIZE" "none"
     GET_BUILD_VAR "TARGET_DTBO_PARTITION_SIZE" "none"
     GET_BUILD_VAR "TARGET_INIT_BOOT_PARTITION_SIZE" "none"
     GET_BUILD_VAR "TARGET_VENDOR_BOOT_PARTITION_SIZE" "none"
-    GET_BUILD_VAR "TARGET_CACHE_PARTITION_SIZE" "none"
     GET_BUILD_VAR "TARGET_SUPER_PARTITION_SIZE"
     GET_BUILD_VAR "SOURCE_SUPER_GROUP_NAME"
     GET_BUILD_VAR "TARGET_SUPER_GROUP_NAME" "$SOURCE_SUPER_GROUP_NAME"
