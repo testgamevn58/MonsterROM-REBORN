@@ -35,9 +35,8 @@ if [ ! -f "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" ]; then
     LOG_STEP_OUT
 fi
 
-LOG_STEP_IN "- Disabling VaultKeeper/FaultKeeper support"
+LOG_STEP_IN "- Disabling VaultKeeper support"
 if [[ "$SOURCE_PLATFORM_SDK_VERSION" -lt 37 ]]; then
-    # S24+ Patching Logic (SDK < 37)
     if xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "39d9199428518152"; then
         HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" "39d9199428518152" "000080d228518152"
     elif xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "2897773948050037"; then
