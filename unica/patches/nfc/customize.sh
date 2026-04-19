@@ -1,12 +1,4 @@
     BLOBS_LIST="
-    system/lib64/libnfc_sec_jni.so
-    "
-    for blob in $BLOBS_LIST
-    do
-        DELETE_FROM_WORK_DIR "system" "$blob"
-    done
-
-    BLOBS_LIST="
     system/etc/libnfc-nci.conf
     system/lib64/libnfc_nci_jni.so
     system/lib64/libnfc_prop_extn.so

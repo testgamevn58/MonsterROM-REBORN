@@ -102,8 +102,8 @@ if [[ "$SOURCE_PRODUCT_FIRST_API_LEVEL" -gt 33 && "$TARGET_PRODUCT_FIRST_API_LEV
     LOG_STEP_OUT
 fi
 
-if [[ "$SOURCE_PLATFORM_SDK_VERSION" -le 37 ]]; then
-    LOG_STEP_IN "- Downgrading VaultKeeper JNI"
+if [[ "$SOURCE_PLATFORM_SDK_VERSION" -ge 37 ]]; then
+    LOG_STEP_IN "- Downgrading VaultKeeper JNI for SDK 37+"
     DELETE_FROM_WORK_DIR "system" "system/lib64/vendor.samsung.hardware.security.vaultkeeper-V1-ndk.so"
     ADD_TO_WORK_DIR "r11sxxx" "system" "system/lib64/libvkjni.so" 0 0 644 "u:object_r:system_lib_file:s0"
     ADD_TO_WORK_DIR "r11sxxx" "system" "system/lib64/libvkmanager.so" 0 0 644 "u:object_r:system_lib_file:s0"
