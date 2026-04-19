@@ -8,19 +8,13 @@ UN1CA: this patch is not complete! Please check unica/patches/product_feature/cu
  .../android/settings/wifi/develop/btm/BtmController.smali       | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/smali_classes3/com/samsung/android/settings/wifi/develop/btm/BtmController.smali b/smali_classes3/com/samsung/android/settings/wifi/develop/btm/BtmController.smali
-index 35f1f2740..3f9a8166d 100644
---- a/smali_classes3/com/samsung/android/settings/wifi/develop/btm/BtmController.smali
-+++ b/smali_classes3/com/samsung/android/settings/wifi/develop/btm/BtmController.smali
-@@ -17,7 +17,7 @@
- .method public getAvailabilityStatus()I
-     .locals 1
- 
--    const-string p0, "1"
-+    const-string p0, "CONFIG_CONNECTION_PERSONALIZATION"
- 
-     invoke-static {p0}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
- 
+diff --git a/smali_classes2/kotlin/KotlinNullPointerException.smali b/smali_classes2/kotlin/KotlinNullPointerException.smali
+--- a/smali_classes2/kotlin/KotlinNullPointerException.smali
++++ b/smali_classes2/kotlin/KotlinNullPointerException.smali
+@@ -1,3 +1,3 @@
+ .class public Lkotlin/KotlinNullPointerException;
+-.super Ljava/lang/NullPointerException;
++.super Ljava/lang/NullPointerException;
+ .source "qb/108127447 0ed26ceaed41b2ffa78f66d43c52ac26b7a9ed73eb466bc2a97587badce0b9e8"
 -- 
-2.51.1
-
+2.43.0

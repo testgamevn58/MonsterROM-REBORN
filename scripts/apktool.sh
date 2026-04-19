@@ -41,18 +41,9 @@ BUILD()
     local FILE_NAME
     FILE_NAME="$(basename "$INPUT_FILE")"
 
-    if [[ "$INPUT_FILE" == *".apk" ]]; then
-        local CERT_PREFIX="aosp"
-        $ROM_IS_OFFICIAL && CERT_PREFIX="unica"
-
-        LOG "- Signing ${INPUT_FILE//$WORK_DIR/}"
-        EVAL "signapk \"$SRC_DIR/security/${CERT_PREFIX}_platform.x509.pem\" \"$SRC_DIR/security/${CERT_PREFIX}_platform.pk8\" \"$OUTPUT_PATH/dist/$FILE_NAME\" \"$OUTPUT_PATH/dist/temp.apk\"" || exit 1
-        mv -f "$OUTPUT_PATH/dist/temp.apk" "$OUTPUT_PATH/dist/$FILE_NAME"
-    else
-        LOG "- Zipaligning ${INPUT_FILE//$WORK_DIR/}"
-        EVAL "zipalign -p 4 \"$OUTPUT_PATH/dist/$FILE_NAME\" \"$OUTPUT_PATH/dist/temp\"" || exit 1
-        mv -f "$OUTPUT_PATH/dist/temp" "$OUTPUT_PATH/dist/$FILE_NAME"
-    fi
+    LOG "- Zipaligning ${INPUT_FILE//$WORK_DIR/}"
+    EVAL "zipalign -p 4 \"$OUTPUT_PATH/dist/$FILE_NAME\" \"$OUTPUT_PATH/dist/temp\"" || exit 1
+    mv -f "$OUTPUT_PATH/dist/temp" "$OUTPUT_PATH/dist/$FILE_NAME"
 
     mkdir -p "$(dirname "$INPUT_FILE")"
     mv -f "$OUTPUT_PATH/dist/$FILE_NAME" "$INPUT_FILE"
@@ -89,13 +80,13 @@ DECODE()
     fi
 
     LOG "- Decoding ${INPUT_FILE//$WORK_DIR/}"
-
-    # Decode APK with --no-debug-info, which will disassemble DEX file with the following flags:
-    # - Disabled synthetic accessors comments
-    # - Disabled debug info
-    # - Use .locals directive instead of the .registers one
-    # - Use a sequential numbering scheme for labels
     EVAL "apktool d --no-debug-info -j \"$THREAD_COUNT\" -o \"$OUTPUT_PATH\" -p \"$FRAMEWORK_DIR\" -t \"$FRAMEWORK_TAG\" \"$INPUT_FILE\"" || exit 1
+
+    if [ -f "$OUTPUT_PATH/apktool.yml" ]; then
+        if ! grep -q "sdkInfo:" "$OUTPUT_PATH/apktool.yml"; then
+            echo -e "sdkInfo:\n  minSdkVersion: '36'\n  targetSdkVersion: '36'" >> "$OUTPUT_PATH/apktool.yml"
+        fi
+    fi
 }
 
 PREPARE_SCRIPT()

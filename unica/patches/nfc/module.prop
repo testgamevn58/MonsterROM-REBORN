@@ -1,4 +1,4 @@
 id=nfc
-name=NFC patches
-author=salvogiangri
-description=Applies NFC patches in work dir.
+name=nfcfix
+author=devcore94,dupa
+description=fixing crash of nfc when opening in settings.

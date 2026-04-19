@@ -1,0 +1,449 @@
+From 76dd432b1680fa954dead5f072046c1ce7fd6d16 Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Thu, 28 Aug 2025 18:58:51 +0200
+Subject: [PATCH] Add optical FOD support
+
+---
+ .../keyguard/KeyguardSecUpdateMonitor.smali   |   6 +
+ ...onitorImpl$$ExternalSyntheticLambda9.smali |  14 +-
+ .../KeyguardSecUpdateMonitorImpl.smali        | 344 ++++++++++++---
+ smali/com/android/systemui/LsRune.smali       |   4 +
+ .../features/GlobalActionFeatures.smali       |   8 +-
+ .../KeyguardFastBioUnlockController.smali     |  27 ++
+ ...llerImpl$playCannedUnlockAnimation$6.smali |  35 +-
+ .../keyguard/KeyguardViewMediator.smali       |  15 +-
+ .../KeyguardViewMediatorHelperImpl.smali      | 407 +++++++++---------
+ ...ationShadeWindowControllerHelperImpl.smali |  25 +-
+ .../statusbar/phone/CentralSurfacesImpl.smali |  95 ++--
+ .../android/systemui/util/DeviceState.smali   |  36 +-
+ .../android/systemui/util/DeviceType.smali    |  12 +-
+ 13 files changed, 671 insertions(+), 357 deletions(-)
+
+diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
+--- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
++++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
+@@ -86,7 +86,7 @@
+ 
+ .field public mFpInDisplayState:I
+ 
+-.field public final mFpMaskToken:Landroid/os/IBinder;
++.field public mFpMaskToken:Landroid/os/IBinder;
+ 
+ .field public final mFpMessages:Ljava/util/concurrent/ConcurrentLinkedQueue;
+ 
+@@ -253,6 +253,46 @@
+ 
+     invoke-virtual {p0, p1}, Lcom/android/systemui/util/SettingsHelper;->setFingerprintSensorPopupDoNotShowAgain(Z)V
+ 
++    return-void
++.end method
++
++.method public static $r8$lambda$kJTDZ_s3Y5_-kkqejQUfg2hm3D0(Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;)V
++    .locals 1
++
++    const/4 v0, 0x2
++
++    invoke-virtual {p0, v0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->updateFingerprintListeningState(I)V
++
++    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY_OPTICAL:Z
++
++    if-eqz v0, :cond_1
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mSettingsHelper:Lcom/android/systemui/util/SettingsHelper;
++
++    invoke-virtual {v0}, Lcom/android/systemui/util/SettingsHelper;->isOneHandModeRunning()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_0
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->removeMaskViewForOpticalFpSensor()V
++
++    return-void
++
++    :cond_0
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->isFingerprintDetectionRunning()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_1
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpMaskToken:Landroid/os/IBinder;
++
++    if-nez v0, :cond_1
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->addMaskViewForOpticalFpSensor()V
++
++    :cond_1
+     return-void
+ .end method
+ 
+@@ -1117,6 +1157,41 @@
+     return-void
+ .end method
+ 
++.method public final addMaskViewForOpticalFpSensor()V
++    .locals 2
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpm:Landroid/hardware/fingerprint/FingerprintManager;
++
++    if-eqz v0, :cond_0
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpMaskToken:Landroid/os/IBinder;
++
++    if-nez v0, :cond_0
++
++    const-string v0, "KeyguardFingerprint"
++
++    const-string v1, "semAddMaskView()"
++
++    invoke-static {v0, v1}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpm:Landroid/hardware/fingerprint/FingerprintManager;
++
++    invoke-virtual {v0}, Landroid/hardware/fingerprint/FingerprintManager;->semAddMaskView()Landroid/os/IBinder;
++
++    move-result-object v0
++
++    iput-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpMaskToken:Landroid/os/IBinder;
++
++    const/4 v0, 0x1
++
++    const/4 v1, 0x3
++
++    invoke-virtual {p0, v1, v0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setFocusForBiometrics(IZ)V
++
++    :cond_0
++    return-void
++.end method
++
+ .method public final checkValidPrevCredentialType()Z
+     .locals 2
+ 
+@@ -5405,9 +5480,33 @@
+ .method public final handleFingerprintAuthenticated(IZ)V
+     .locals 1
+ 
++    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY_OPTICAL:Z
++
++    if-eqz v0, :cond_1
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->is2StepVerification()Z
++
++    move-result v0
++
++    if-nez v0, :cond_0
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isForcedLock()Z
++
++    move-result v0
++
++    if-nez v0, :cond_0
++
++    iget-boolean v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mKeyguardShowing:Z
++
++    if-nez v0, :cond_1
++
++    :cond_0
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->removeMaskViewForOpticalFpSensor()V
++
++    :cond_1
+     sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_SUB_DISPLAY_COVER:Z
+ 
+-    if-eqz v0, :cond_0
++    if-eqz v0, :cond_2
+ 
+     const/4 v0, 0x0
+ 
+@@ -5417,7 +5516,7 @@
+ 
+     iput-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubWofFpAuth:Z
+ 
+-    :cond_0
++    :cond_2
+     invoke-super {p0, p1, p2}, Lcom/android/keyguard/KeyguardUpdateMonitor;->handleFingerprintAuthenticated(IZ)V
+ 
+     return-void
+@@ -5523,7 +5622,7 @@
+ 
+     goto :goto_1
+ 
+-    :cond_5
++    :cond_6
+     const/16 v1, 0x3ed
+ 
+     if-ne v1, p1, :cond_7
+@@ -5538,7 +5637,7 @@
+ 
+     goto :goto_1
+ 
+-    :cond_6
++    :cond_7
+     :goto_0
+     iget-object p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mContext:Landroid/content/Context;
+ 
+@@ -5548,7 +5647,7 @@
+ 
+     move-result-object p2
+ 
+-    :cond_7
++    :cond_8
+     :goto_1
+     iget-object v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mPowerManager:Landroid/os/PowerManager;
+ 
+@@ -12547,6 +12646,37 @@
+     return-void
+ .end method
+ 
++.method public final removeMaskViewForOpticalFpSensor()V
++    .locals 2
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpm:Landroid/hardware/fingerprint/FingerprintManager;
++
++    if-eqz v0, :cond_0
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpMaskToken:Landroid/os/IBinder;
++
++    if-eqz v0, :cond_0
++
++    const-string v0, "KeyguardFingerprint"
++
++    const-string v1, "semRemoveMaskView()"
++
++    invoke-static {v0, v1}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpm:Landroid/hardware/fingerprint/FingerprintManager;
++
++    iget-object v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpMaskToken:Landroid/os/IBinder;
++
++    invoke-virtual {v0, v1}, Landroid/hardware/fingerprint/FingerprintManager;->semRemoveMaskView(Landroid/os/IBinder;)I
++
++    const/4 v0, 0x0
++
++    iput-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpMaskToken:Landroid/os/IBinder;
++
++    :cond_0
++    return-void
++.end method
++
+ .method public final reportFailedBiometricUnlockAttempt(I)V
+     .locals 9
+ 
+@@ -12718,44 +12848,49 @@
+ 
+     move-result v0
+ 
++    if-eqz v0, :cond_2
++
++    new-instance v0, Ljava/lang/StringBuilder;
++
++    const-string/jumbo v1, "requestSessionClose() - isFingerprintDetectionRunning : "
++
++    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->isFingerprintDetectionRunning()Z
++
++    move-result v1
++
++    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
++
++    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
++
++    move-result-object v0
++
++    const-string v1, "KeyguardFingerprint"
++
++    invoke-static {v1, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->isFingerprintDetectionRunning()Z
++
++    move-result v0
++
+     if-eqz v0, :cond_1
+ 
+-    new-instance v0, Ljava/lang/StringBuilder;
+-
+-    const-string/jumbo v1, "requestSessionClose() - isFingerprintDetectionRunning : "
+-
+-    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->isFingerprintDetectionRunning()Z
+-
+-    move-result v1
+-
+-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
+-
+-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+-
+-    move-result-object v0
+-
+-    const-string v1, "KeyguardFingerprint"
+-
+-    invoke-static {v1, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->isFingerprintDetectionRunning()Z
+-
+-    move-result v0
++    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY_OPTICAL:Z
+ 
+     if-eqz v0, :cond_0
+ 
+-    sget-object v0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+-
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->removeMaskViewForOpticalFpSensor()V
++
++    :cond_0
+     invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->stopListeningForFingerprint()V
+ 
+     goto :goto_0
+ 
+-    :cond_0
++    :cond_1
+     iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mFingerprintCancelSignal:Landroid/os/CancellationSignal;
+ 
+-    if-eqz v0, :cond_1
++    if-eqz v0, :cond_2
+ 
+     invoke-virtual {v0}, Landroid/os/CancellationSignal;->cancel()V
+ 
+@@ -12763,7 +12898,7 @@
+ 
+     iput-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mFingerprintCancelSignal:Landroid/os/CancellationSignal;
+ 
+-    :cond_1
++    :cond_2
+     :goto_0
+     const-class v0, Lcom/android/systemui/UiOffloadThread;
+ 
+@@ -14241,16 +14376,21 @@
+ 
+     iput-boolean p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mKeyguardUnlocking:Z
+ 
++    if-eqz p1, :cond_2
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->stopListeningForFingerprint()V
++
++    sget-object p1, Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;->FACE_AUTH_UPDATED_KEYGUARD_UNLOCKING:Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;
++
++    invoke-virtual {p0, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->stopListeningForFace(Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;)V
++
++    sget-boolean p1, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY_OPTICAL:Z
++
+     if-eqz p1, :cond_1
+ 
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->stopListeningForFingerprint()V
+-
+-    sget-object p1, Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;->FACE_AUTH_UPDATED_KEYGUARD_UNLOCKING:Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;
+-
+-    invoke-virtual {p0, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->stopListeningForFace(Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;)V
+-
+-    sget-object p1, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+-
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->removeMaskViewForOpticalFpSensor()V
++
++    :cond_1
+     new-instance p1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda12;
+ 
+     const/4 v0, 0x2
+@@ -14261,7 +14401,7 @@
+ 
+     invoke-virtual {p0, p1, v0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->dispatchCallback(Ljava/util/function/Consumer;Ljava/lang/String;)V
+ 
+-    :cond_1
++    :cond_2
+     :goto_0
+     return-void
+ .end method
+diff --git a/smali_classes2/com/android/systemui/inputdevice/tutorial/data/repository/DeviceType.smali b/smali_classes2/com/android/systemui/inputdevice/tutorial/data/repository/DeviceType.smali
+--- a/smali_classes2/com/android/systemui/inputdevice/tutorial/data/repository/DeviceType.smali
++++ b/smali_classes2/com/android/systemui/inputdevice/tutorial/data/repository/DeviceType.smali
+@@ -29,7 +29,7 @@
+ 
+     const-string v1, "KEYBOARD"
+ 
+-    const/4 v2, 0x0
++    const/4 v2, 0x1
+ 
+     invoke-direct {v0, v1, v2}, Lcom/android/systemui/inputdevice/tutorial/data/repository/DeviceType;-><init>(Ljava/lang/String;I)V
+ 
+diff --git a/smali_classes4/com/android/systemui/util/DeviceState.smali b/smali_classes4/com/android/systemui/util/DeviceState.smali
+--- a/smali_classes4/com/android/systemui/util/DeviceState.smali
++++ b/smali_classes4/com/android/systemui/util/DeviceState.smali
+@@ -1176,21 +1176,47 @@
+     :catchall_0
+     move-exception v1
+ 
+-    goto :goto_1
++    goto :goto_3
+ 
+     :cond_0
+     :goto_0
+-    sget-object v1, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
++    sget-boolean v1, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY_OPTICAL:Z
++
++    if-eqz v1, :cond_2
++
++    sget-object v1, Lcom/android/systemui/util/DeviceState;->sDisplaySize:Landroid/graphics/Point;
++
++    iget v2, v1, Landroid/graphics/Point;->x:I
++
++    iget v1, v1, Landroid/graphics/Point;->y:I
++
++    invoke-static {v2, v1}, Ljava/lang/Math;->min(II)I
++
++    move-result v1
+     :try_end_0
+     .catchall {:try_start_0 .. :try_end_0} :catchall_0
+ 
++    const/16 v2, 0x2d0
++
++    if-le v1, v2, :cond_1
++
++    goto :goto_1
++
++    :cond_1
++    const/4 v1, 0x0
++
++    goto :goto_2
++
++    :cond_2
++    :goto_1
++    const/4 v1, 0x1
++
++    :goto_2
+     monitor-exit v0
+ 
+-    const/4 v0, 0x1
+-
+-    return v0
+-
+-    :goto_1
++    return v1
++
++    :goto_3
+     :try_start_1
+     monitor-exit v0
+     :try_end_1
+diff --git a/smali/com/android/systemui/LsRune.smali b/smali/com/android/systemui/LsRune.smali
+--- a/smali/com/android/systemui/LsRune.smali
++++ b/smali/com/android/systemui/LsRune.smali
+@@ -134,6 +134,8 @@
+ 
+ .field public static final SECURITY_FINGERPRINT_IN_DISPLAY:Z
+ 
++.field public static final SECURITY_FINGERPRINT_IN_DISPLAY_OPTICAL:Z
++
+ .field public static final SECURITY_HAPTIC_FEEDBACK_ON_DC_MOTOR:Z
+ 
+ .field public static final SECURITY_LAYERED_BOUNCER_BLUR:Z
+@@ -678,6 +680,8 @@
+ 
+     :goto_f
+     sput-boolean v7, Lcom/android/systemui/LsRune;->SECURITY_DEAD_ZONE:Z
++    sput-boolean v2, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY_OPTICAL:Z
++
+ 
+     invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
+ 
+-- 
+2.43.0

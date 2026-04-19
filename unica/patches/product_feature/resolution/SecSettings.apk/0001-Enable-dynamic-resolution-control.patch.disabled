@@ -1,0 +1,608 @@
+From aacd84e6a20b5c785b93eaed41614c66b8e6851d Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Mon, 13 Oct 2025 14:55:01 +0200
+Subject: [PATCH] Enable dynamic resolution control
+
+UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
+---
+ .../coroutines/JobSupport$Finishing.smali     |    2 +-
+ .../android/settings/DisplaySettings$3.smali  |   24 +
+ .../android/settings/DisplaySettings$4.smali  |  246 ++-
+ .../Utils$$ExternalSyntheticLambda3.smali     |   52 +-
+ .../Utils$$ExternalSyntheticLambda4.smali     |   38 +
+ .../Utils$$ExternalSyntheticOutline0.smali    |   18 +
+ .../com/android/settings/Utils.smali          |  128 +-
+ ...onsAdapter$$ExternalSyntheticLambda1.smali |  222 +++
+ ...onsAdapter$$ExternalSyntheticLambda2.smali |  211 +--
+ ...onsAdapter$$ExternalSyntheticLambda6.smali |  108 ++
+ ...onsAdapter$$ExternalSyntheticLambda8.smali |   80 +
+ ...nageApplications$ApplicationsAdapter.smali |   30 +-
+ .../biometrics/BiometricEnrollActivity.smali  |    2 +-
+ ...ilsAmbientVolumePreferenceController.smali |    2 +-
+ .../settings/bluetooth/BluetoothEnabler.smali |    2 +-
+ ...AudioSharingBasePreferenceController.smali |    2 +-
+ .../AudioStreamsCategoryController.smali      |    2 +-
+ ...AppLocaleAllListPreferenceController.smali |    2 +-
+ ...lePickerBaseListPreferenceController.smali |    2 +-
+ .../SimOnboardingService$initData$1.smali     |    2 +-
+ .../settings/network/apn/ApnSettings.smali    |    2 +-
+ .../modes/SetupInterstitialActivity.smali     |    4 +-
+ .../android/settings/nfc/NfcEnabler.smali     |    2 +-
+ .../taskbar/TaskBarPreferenceController.smali |    2 +-
+ .../ProtectionPromptActivity.smali            |    2 +-
+ .../uwb/UwbPreferenceController.smali         |    2 +-
+ ...zardActivity$InternetResultHandler$1.smali |    2 +-
+ .../mobileap/WifiApSwitchController$1.smali   |    2 +-
+ .../wifi/mobileap/WifiApSwitchEnabler.smali   |    4 +-
+ .../mobileap/WifiApSwitchEnabler1$2.smali     |    2 +-
+ .../wifi/mobileap/WifiApSwitchEnabler1.smali  |    2 +-
+ .../wifi/mobileap/WifiApWarning.smali         |    2 +-
+ .../WifiApAutoHotspotSwitchEnabler.smali      |    2 +-
+ .../WifiApFamilySharingSwitchEnabler.smali    |    2 +-
+ .../WifiApSaAutoHotspotSwitchEnabler.smali    |    2 +-
+ .../WifiApSaFamilySharingSwitchEnabler.smali  |    2 +-
+ .../WifiApConfigurePmfController.smali        |    2 +-
+ ...WifiApConfigureWifiSharingController.smali |    4 +-
+ .../mobileap/utils/WifiApSettingsUtils.smali  |    2 +-
+ .../com/samsung/android/settings/Rune.smali   |    4 +-
+ .../BixbyRoutineActionHandler.smali           |    2 +-
+ .../CheckBluetoothStateActivity$1.smali       |    2 +-
+ ...atelliteNetworksPreferenceController.smali |    2 +-
+ .../datausage/SecBillingCycleManager.smali    |    2 +-
+ .../SecDeviceInfoUtils$Operator.smali         |    4 +-
+ .../ScreenResolutionFragment$2$2.smali        |   16 +-
+ .../display/ScreenResolutionFragment$2.smali  |   10 +-
+ .../display/ScreenResolutionFragment.smali    |   59 +-
+ .../display/ScreenZoomSettingsReceiver.smali  |   10 +
+ .../settings/display/SecDisplayUtils.smali    |  516 ++++++-
+ .../SecScreenZoomPreferenceFragment.smali     |  805 +++++-----
+ .../EasyModePreferenceController.smali        |   71 +-
+ ...ScreenResolutionPreferenceController.smali |   31 +-
+ ...reenResolutionSingleChoiceController.smali |   31 +-
+ .../eternal/provider/items/DisplayItem.smali  | 1353 +++++++++--------
+ ...elSamsungAccountPreferenceController.smali |    4 +-
+ .../settings/lockscreen/LockUtils.smali       |    2 +-
+ 57 files changed, 2601 insertions(+), 1542 deletions(-)
+ create mode 100644 smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda4.smali
+ create mode 100644 smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda1.smali
+ create mode 100644 smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6.smali
+ create mode 100644 smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8.smali
+
+diff --git a/smali_classes5/com/samsung/android/settings/display/SecDisplayUtils.smali b/smali_classes5/com/samsung/android/settings/display/SecDisplayUtils.smali
+--- a/smali_classes5/com/samsung/android/settings/display/SecDisplayUtils.smali
++++ b/smali_classes5/com/samsung/android/settings/display/SecDisplayUtils.smali
+@@ -21,7 +21,7 @@
+ .method static constructor <clinit>()V
+     .locals 3
+ 
+-    const-string/jumbo v0, "ro.product.device"
++    const-string/jumbo v0, "ro.product.vendor.device"
+ 
+     const-string v1, "NONE"
+ 
+@@ -2385,7 +2385,7 @@
+ 
+     move-result v0
+ 
+-    const-string/jumbo v5, "ro.product.device"
++    const-string/jumbo v5, "ro.product.vendor.device"
+ 
+     const-string v9, "NONE"
+ 
+@@ -2584,6 +2584,14 @@
+     move-result v0
+ 
+     new-array v0, v0, [I
++    int-to-float v14, v14
++
++    aget v15, v6, v5
++
++    mul-float/2addr v14, v15
++
++    float-to-int v14, v14
++
+ 
+     const/4 v13, 0x0
+ 
+@@ -2992,7 +3000,7 @@
+ 
+     move-result v7
+ 
+-    const-string/jumbo v11, "ro.product.device"
++    const-string/jumbo v11, "ro.product.vendor.device"
+ 
+     const-string v8, "NONE"
+ 
+@@ -5916,7 +5924,7 @@
+ .end method
+ 
+ .method public static setDisplayMode(Ljava/lang/String;Landroid/view/Display;)V
+-    .locals 7
++    .locals 8
+ 
+     invoke-static {p0}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+ 
+diff --git a/smali_classes5/com/samsung/android/settings/display/ScreenZoomSettingsReceiver.smali b/smali_classes5/com/samsung/android/settings/display/ScreenZoomSettingsReceiver.smali
+--- a/smali_classes5/com/samsung/android/settings/display/ScreenZoomSettingsReceiver.smali
++++ b/smali_classes5/com/samsung/android/settings/display/ScreenZoomSettingsReceiver.smali
+@@ -137,6 +137,10 @@
+ 
+     sget-object v3, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
+ 
++    invoke-static {p1}, Lcom/samsung/android/settings/display/SecDisplayUtils;->getScreenResolution(Landroid/content/Context;)I
++
++    move-result v3
++
+     invoke-interface {v2, v1}, Landroid/view/IWindowManager;->getInitialDisplayDensity(I)I
+ 
+     move-result v1
+@@ -146,6 +150,12 @@
+     invoke-direct {v2, p2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+ 
+     invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
++
++    const-string p2, " resolution index="
++
++    invoke-virtual {v2, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+ 
+     invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+ 
+diff --git a/smali_classes5/com/samsung/android/settings/display/controller/ScreenResolutionPreferenceController.smali b/smali_classes5/com/samsung/android/settings/display/controller/ScreenResolutionPreferenceController.smali
+--- a/smali_classes5/com/samsung/android/settings/display/controller/ScreenResolutionPreferenceController.smali
++++ b/smali_classes5/com/samsung/android/settings/display/controller/ScreenResolutionPreferenceController.smali
+@@ -155,11 +155,36 @@
+ .end method
+ 
+ .method public getAvailabilityStatus()I
+-    .locals 0
+-
+-    sget-object p0, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
+-
+-    const/4 p0, 0x3
++    .locals 1
++
++    sget-object v0, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
++
++    iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
++
++    invoke-static {v0}, Lcom/android/settings/Utils;->isDesktopModeEnabled(Landroid/content/Context;)Z
++
++    move-result v0
++
++    if-nez v0, :cond_res_res_1
++
++    iget-object p0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
++
++    invoke-static {p0}, Lcom/android/settings/Utils;->isDesktopDualMode(Landroid/content/Context;)Z
++
++    move-result p0
++
++    if-eqz p0, :cond_res_res_0
++
++    goto :goto_res_res_0
++
++    :cond_res_res_0
++    const/4 p0, 0x0
++
++    return p0
++
++    :cond_res_res_1
++    :goto_res_res_0
++    const/4 p0, 0x5
+ 
+     return p0
+ .end method
+diff --git a/smali_classes5/com/samsung/android/settings/display/controller/SecScreenResolutionSingleChoiceController.smali b/smali_classes5/com/samsung/android/settings/display/controller/SecScreenResolutionSingleChoiceController.smali
+--- a/smali_classes5/com/samsung/android/settings/display/controller/SecScreenResolutionSingleChoiceController.smali
++++ b/smali_classes5/com/samsung/android/settings/display/controller/SecScreenResolutionSingleChoiceController.smali
+@@ -518,11 +518,36 @@
+ .end method
+ 
+ .method public getAvailabilityStatus()I
+-    .locals 0
+-
+-    sget-object p0, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
+-
+-    const/4 p0, 0x3
++    .locals 1
++
++    sget-object v0, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
++
++    iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
++
++    invoke-static {v0}, Lcom/android/settings/Utils;->isDesktopModeEnabled(Landroid/content/Context;)Z
++
++    move-result v0
++
++    if-nez v0, :cond_res_res_1
++
++    iget-object p0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
++
++    invoke-static {p0}, Lcom/android/settings/Utils;->isDesktopDualMode(Landroid/content/Context;)Z
++
++    move-result p0
++
++    if-eqz p0, :cond_res_res_0
++
++    goto :goto_res_res_0
++
++    :cond_res_res_0
++    const/4 p0, 0x0
++
++    return p0
++
++    :cond_res_res_1
++    :goto_res_res_0
++    const/4 p0, 0x5
+ 
+     return p0
+ .end method
+diff --git a/smali_classes5/com/samsung/android/settings/display/ScreenResolutionFragment$2$2.smali b/smali_classes5/com/samsung/android/settings/display/ScreenResolutionFragment$2$2.smali
+--- a/smali_classes5/com/samsung/android/settings/display/ScreenResolutionFragment$2$2.smali
++++ b/smali_classes5/com/samsung/android/settings/display/ScreenResolutionFragment$2$2.smali
+@@ -16,15 +16,21 @@
+ .method public final onClick(Landroid/content/DialogInterface;I)V
+     .locals 1
+ 
+-    iget p1, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment$2$2;->val$selected:I
++    iget-object p1, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment$2$2;->this$1:Lcom/samsung/android/settings/display/ScreenResolutionFragment$2;
+ 
+-    invoke-static {p1}, Ljava/lang/Integer;->toString(I)Ljava/lang/String;
++    iget-object p1, p1, Lcom/samsung/android/settings/display/ScreenResolutionFragment$2;->this$0:Lcom/samsung/android/settings/display/ScreenResolutionFragment;
+ 
+-    move-result-object p1
++    iget-object p1, p1, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mContext:Landroid/content/Context;
+ 
+-    sget-object p2, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mDisplay:Landroid/view/Display;
++    iget p2, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment$2$2;->val$selected:I
+ 
+-    invoke-static {p1, p2}, Lcom/samsung/android/settings/display/SecDisplayUtils;->setDisplayMode(Ljava/lang/String;Landroid/view/Display;)V
++    invoke-static {p2}, Ljava/lang/Integer;->toString(I)Ljava/lang/String;
++
++    move-result-object p2
++
++    sget-object v0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mDisplay:Landroid/view/Display;
++
++    invoke-static {p1, p2, v0}, Lcom/samsung/android/settings/display/SecDisplayUtils;->setDisplayMode(Landroid/content/Context;Ljava/lang/String;Landroid/view/Display;)V
+ 
+     iget-object p1, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment$2$2;->this$1:Lcom/samsung/android/settings/display/ScreenResolutionFragment$2;
+ 
+diff --git a/smali_classes5/com/samsung/android/settings/display/controller/EasyModePreferenceController.smali b/smali_classes5/com/samsung/android/settings/display/controller/EasyModePreferenceController.smali
+--- a/smali_classes5/com/samsung/android/settings/display/controller/EasyModePreferenceController.smali
++++ b/smali_classes5/com/samsung/android/settings/display/controller/EasyModePreferenceController.smali
+@@ -102,9 +102,9 @@
+ .method public final updateEasyModeState(Z)V
+     .locals 4
+ 
+-    const/4 v0, 0x0
+-
+-    const/4 v1, 0x1
++    const/4 v0, 0x1
++
++    const/4 v1, 0x0
+ 
+     if-eqz p1, :cond_0
+ 
+diff --git a/smali/com/android/settings/DisplaySettings$3.smali b/smali/com/android/settings/DisplaySettings$3.smali
+--- a/smali/com/android/settings/DisplaySettings$3.smali
++++ b/smali/com/android/settings/DisplaySettings$3.smali
+@@ -12,6 +12,30 @@
+     invoke-direct {p0}, Ljava/util/ArrayList;-><init>()V
+ 
+     sget-object v0, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
++
++    invoke-static {p1}, Lcom/samsung/android/settings/display/SecDisplayUtils;->getScreenResolution(Landroid/content/Context;)I
++
++    move-result v0
++
++    const/16 v1, 0x1d10
++
++    invoke-static {v1}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
++
++    move-result-object v1
++
++    invoke-static {v0}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
++
++    move-result-object v0
++
++    new-instance v2, Lcom/samsung/android/settings/logging/status/StatusData;
++
++    invoke-direct {v2}, Ljava/lang/Object;-><init>()V
++
++    iput-object v0, v2, Lcom/samsung/android/settings/logging/status/StatusData;->mStatusValue:Ljava/lang/String;
++
++    iput-object v1, v2, Lcom/samsung/android/settings/logging/status/StatusData;->mStatusKey:Ljava/lang/String;
++
++    invoke-virtual {p0, v2}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+ 
+     invoke-static {p1}, Lcom/samsung/android/settings/display/SecDisplayUtils;->getScreenZoomInfo(Landroid/content/Context;)[I
+ 
+diff --git a/smali/com/android/settings/display/ScreenResolutionFragment.smali b/smali/com/android/settings/display/ScreenResolutionFragment.smali
+--- a/smali/com/android/settings/display/ScreenResolutionFragment.smali
++++ b/smali/com/android/settings/display/ScreenResolutionFragment.smali
+@@ -794,3 +794,44 @@
+     :cond_1
+     return-void
+ .end method
++    iget-object v0, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mScreenResolutionButton:Lcom/samsung/android/settings/widget/SecHorizontalRadioPreference;
++
++    if-eqz v0, :cond_res_res_1
++
++    iget-object v1, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mApplyButton:Lcom/samsung/android/settings/widget/SecButtonPreference;
++
++    if-eqz v1, :cond_res_res_1
++
++    iget v1, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mScreenResolution:I
++
++    invoke-static {v1}, Ljava/lang/Integer;->toString(I)Ljava/lang/String;
++
++    move-result-object v1
++
++    invoke-virtual {v0, v1}, Lcom/samsung/android/settings/widget/SecHorizontalRadioPreference;->setValue(Ljava/lang/String;)V
++
++    iget-object v0, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mScreenResolutionButton:Lcom/samsung/android/settings/widget/SecHorizontalRadioPreference;
++
++    invoke-virtual {v0}, Lcom/samsung/android/settings/widget/SecHorizontalRadioPreference;->getCurrentValue$1()Ljava/lang/String;
++
++    move-result-object v0
++
++    iget v1, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mScreenResolution:I
++
++    invoke-static {v1}, Ljava/lang/Integer;->toString(I)Ljava/lang/String;
++
++    move-result-object v1
++
++    invoke-static {v0, v1}, Landroid/text/TextUtils;->equals(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Z
++
++    move-result v0
++
++    xor-int/lit8 v0, v0, 0x1
++
++    iput-boolean v0, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mScreenChangeState:Z
++
++    iget-object v1, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mApplyButton:Lcom/samsung/android/settings/widget/SecButtonPreference;
++
++    invoke-virtual {v1, v0}, Landroidx/preference/Preference;->setEnabled(Z)V
++
++    :cond_res_res_1
+diff --git a/smali_classes5/com/samsung/android/settings/eternal/provider/items/DisplayItem.smali b/smali_classes5/com/samsung/android/settings/eternal/provider/items/DisplayItem.smali
+--- a/smali_classes5/com/samsung/android/settings/eternal/provider/items/DisplayItem.smali
++++ b/smali_classes5/com/samsung/android/settings/eternal/provider/items/DisplayItem.smali
+@@ -56,6 +56,86 @@
+ 
+     :cond_1
+     return-object p0
++.end method
++
++.method public static isSameDeviceType(Ljava/lang/String;)Z
++    .locals 3
++
++    const-string/jumbo v0, "ro.build.characteristics"
++
++    invoke-static {v0}, Landroid/os/SystemProperties;->get(Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v0
++
++    if-eqz v0, :cond_res_res_0
++
++    const-string/jumbo v1, "tablet"
++
++    invoke-virtual {v0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
++
++    move-result v2
++
++    if-eqz v2, :cond_res_res_0
++
++    invoke-virtual {p0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    if-eqz v1, :cond_res_res_0
++
++    goto :goto_res_res_0
++
++    :cond_res_res_0
++    const-string/jumbo v1, "phone"
++
++    invoke-virtual {p0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    if-nez v1, :cond_res_res_2
++
++    const-string v1, "nosdcard"
++
++    invoke-virtual {p0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    if-eqz v1, :cond_res_res_1
++
++    goto :goto_res_res_0
++
++    :cond_res_res_1
++    new-instance v1, Ljava/lang/StringBuilder;
++
++    const-string v2, "Device type is not same! backupDeviceType = "
++
++    invoke-direct {v1, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
++
++    invoke-virtual {v1, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    const-string p0, " characteristics = "
++
++    invoke-virtual {v1, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
++
++    move-result-object p0
++
++    const-string v0, "Eternal/DisplayItem"
++
++    invoke-static {v0, p0}, Lcom/samsung/android/util/SemLog;->d(Ljava/lang/String;Ljava/lang/String;)I
++
++    const/4 p0, 0x0
++
++    return p0
++
++    :cond_res_res_2
++    :goto_res_res_0
++    const/4 p0, 0x1
++
++    return p0
+ .end method
+ 
+ 
+@@ -3049,6 +3129,8 @@
+     invoke-static {v14, v0}, Lcom/samsung/android/util/SemLog;->d(Ljava/lang/String;Ljava/lang/String;)I
+ 
+     return-object v5
++
+ 
+     nop
+ 
+@@ -4106,7 +4188,7 @@
+ 
+     goto/16 :goto_1
+ 
+-    :cond_2a
++    :cond_res_res_2b
+     const/4 v1, 0x1
+ 
+     goto :goto_2
+@@ -4828,7 +4910,7 @@
+ 
+     goto/16 :goto_24
+ 
+-    :cond_42
++    :cond_res_res_43
+     sget-object v0, Lcom/samsung/android/lib/episode/SceneResult$ResultType;->RESULT_FAIL:Lcom/samsung/android/lib/episode/SceneResult$ResultType;
+ 
+     invoke-virtual {v8, v0}, Lcom/samsung/android/lib/episode/SceneResult$Builder;->setResult(Lcom/samsung/android/lib/episode/SceneResult$ResultType;)Lcom/samsung/android/lib/episode/SceneResult$Builder;
+@@ -5026,7 +5108,7 @@
+ 
+     goto/16 :goto_24
+ 
+-    :cond_48
++    :cond_res_res_49
+     sget-object v0, Lcom/samsung/android/lib/episode/SceneResult$ResultType;->RESULT_FAIL:Lcom/samsung/android/lib/episode/SceneResult$ResultType;
+ 
+     invoke-virtual {v8, v0}, Lcom/samsung/android/lib/episode/SceneResult$Builder;->setResult(Lcom/samsung/android/lib/episode/SceneResult$ResultType;)Lcom/samsung/android/lib/episode/SceneResult$Builder;
+@@ -5376,6 +5458,10 @@
+     move-result-object v5
+ 
+     const-string v7, "backGestureSensitivitySub"
++
++    invoke-virtual {v2, v6}, Lcom/samsung/android/lib/episode/Scene;->getAttribute(Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v6
+ 
+     invoke-virtual {v2, v7}, Lcom/samsung/android/lib/episode/Scene;->getAttribute(Ljava/lang/String;)Ljava/lang/String;
+ 
+diff --git a/smali_classes5/com/samsung/android/settings/display/ScreenResolutionFragment$2.smali b/smali_classes5/com/samsung/android/settings/display/ScreenResolutionFragment$2.smali
+--- a/smali_classes5/com/samsung/android/settings/display/ScreenResolutionFragment$2.smali
++++ b/smali_classes5/com/samsung/android/settings/display/ScreenResolutionFragment$2.smali
+@@ -235,13 +235,17 @@
+     return-void
+ 
+     :cond_4
++    iget-object v0, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment$2;->this$0:Lcom/samsung/android/settings/display/ScreenResolutionFragment;
++
++    iget-object v0, v0, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mContext:Landroid/content/Context;
++
+     invoke-static {p1}, Ljava/lang/Integer;->toString(I)Ljava/lang/String;
+ 
+-    move-result-object v0
+-
+-    sget-object v1, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mDisplay:Landroid/view/Display;
+-
+-    invoke-static {v0, v1}, Lcom/samsung/android/settings/display/SecDisplayUtils;->setDisplayMode(Ljava/lang/String;Landroid/view/Display;)V
++    move-result-object v1
++
++    sget-object v2, Lcom/samsung/android/settings/display/ScreenResolutionFragment;->mDisplay:Landroid/view/Display;
++
++    invoke-static {v0, v1, v2}, Lcom/samsung/android/settings/display/SecDisplayUtils;->setDisplayMode(Landroid/content/Context;Ljava/lang/String;Landroid/view/Display;)V
+ 
+     iget-object v0, p0, Lcom/samsung/android/settings/display/ScreenResolutionFragment$2;->this$0:Lcom/samsung/android/settings/display/ScreenResolutionFragment;
+ 
+diff --git a/smali_classes5/com/samsung/android/settings/display/SecScreenZoomPreferenceFragment.smali b/smali_classes5/com/samsung/android/settings/display/SecScreenZoomPreferenceFragment.smali
+--- a/smali_classes5/com/samsung/android/settings/display/SecScreenZoomPreferenceFragment.smali
++++ b/smali_classes5/com/samsung/android/settings/display/SecScreenZoomPreferenceFragment.smali
+@@ -1426,7 +1426,7 @@
+ 
+     iget v3, v3, Landroid/util/DisplayMetrics;->widthPixels:I
+ 
+-    int-to-float v3, v3
++    int-to-float v3, v4
+ 
+     cmpg-float v2, v3, v2
+ 
+diff --git a/smali/com/android/settings/Utils$$ExternalSyntheticOutline0.smali b/smali/com/android/settings/Utils$$ExternalSyntheticOutline0.smali
+--- a/smali/com/android/settings/Utils$$ExternalSyntheticOutline0.smali
++++ b/smali/com/android/settings/Utils$$ExternalSyntheticOutline0.smali
+@@ -4,6 +4,24 @@
+ 
+ 
+ # direct methods
++.method public static m(Ljava/lang/String;ZLjava/lang/String;ZLjava/lang/String;)Ljava/lang/StringBuilder;
++    .locals 1
++
++    new-instance v0, Ljava/lang/StringBuilder;
++
++    invoke-direct {v0, p0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
++
++    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
++
++    invoke-virtual {v0, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    invoke-virtual {v0, p3}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
++
++    invoke-virtual {v0, p4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    return-object v0
++.end method
++
+ .method public static m(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+     .locals 1
+ 
+diff --git a/smali_classes5/com/samsung/android/settings/Rune.smali b/smali_classes5/com/samsung/android/settings/Rune.smali
+--- a/smali_classes5/com/samsung/android/settings/Rune.smali
++++ b/smali_classes5/com/samsung/android/settings/Rune.smali
+@@ -4251,6 +4251,14 @@
+     invoke-virtual {v0, v1}, Lcom/samsung/android/feature/SemFloatingFeature;->getInt(Ljava/lang/String;)I
+ 
+     move-result v0
++    const/4 v0, 0x1
++    const/4 v0, 0x1
++    const/4 v0, 0x1
++    const/4 v0, 0x1
++    const/4 v0, 0x1
++    const/4 v0, 0x1
++    const/4 v0, 0x1
++    const/4 v0, 0x1
+ 
+     const/4 v1, 0x1
+ 
+diff --git a/smali/com/android/settings/DisplaySettings$4.smali b/smali/com/android/settings/DisplaySettings$4.smali
+--- a/smali/com/android/settings/DisplaySettings$4.smali
++++ b/smali/com/android/settings/DisplaySettings$4.smali
+@@ -935,7 +935,7 @@
+ 
+     const v4, 0x1110165
+ 
+-    const-string v5, "screensaver_activate_on_dock"
++    const-string v6, "screensaver_activate_on_dock"
+ 
+     if-eqz v1, :cond_22
+ 
+@@ -1144,3 +1144,5 @@
+ 
+     return-void
+ .end method
++
+-- 
+2.43.0

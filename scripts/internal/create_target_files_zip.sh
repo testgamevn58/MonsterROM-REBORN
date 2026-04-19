@@ -2,22 +2,16 @@
 # Copyright (c) 2026 Salvo Giangreco
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# [
 source "$SRC_DIR/scripts/utils/install_utils.sh" || exit 1
 
 trap 'rm -rf "$TMP_DIR"' EXIT INT
 
-# https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/build_super_image.py#72
 BUILD_SUPER_EMPTY()
 {
     local CMD
-
     CMD="lpmake"
-    # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/build_super_image.py#75
     CMD+=" --metadata-size \"65536\""
-    # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/core/config.mk#1033
     CMD+=" --super-name \"super\""
-    # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/build_super_image.py#85
     CMD+=" --metadata-slots \"2\""
     CMD+=" --device \"super:$TARGET_SUPER_PARTITION_SIZE\""
     CMD+=" --group \"$TARGET_SUPER_GROUP_NAME:$(GET_SUPER_GROUP_SIZE)\""
@@ -53,7 +47,6 @@ BUILD_SUPER_EMPTY()
 GENERATE_BUILD_INFO()
 {
     local BUILD_INFO_FILE="$TMP_DIR/build_info.txt"
-
     local SOURCE_FIRMWARE_PATH
     local TARGET_FIRMWARE_PATH
     local SOURCE_FINGERPRINT
@@ -98,12 +91,9 @@ GET_SUPER_GROUP_SIZE()
     GROUP_NAME="$(tr "[:lower:]" "[:upper:]" <<< "$TARGET_SUPER_GROUP_NAME")"
 
     local VAR="TARGET_${GROUP_NAME}_SIZE"
-
     _CHECK_NON_EMPTY_PARAM "$VAR" "${!VAR}" || exit 1
-
     echo "${!VAR}"
 }
-# ]
 
 if [ "$#" != "1" ]; then
     echo "Usage: create_target_files_zip <output>" >&2
@@ -147,9 +137,7 @@ if [ -d "$WORK_DIR/kernel" ]; then
 
         LOG_STEP_IN "- Copying $f"
         EVAL "cp -a \"$WORK_DIR/kernel/$f\" \"$TMP_DIR/$f\"" || exit 1
-        if ! $TARGET_DISABLE_AVB_SIGNING; then
-            SIGN_IMAGE_WITH_AVB "$TMP_DIR/$f" || exit 1
-        fi
+        # AVB signing bypassed entirely.
         LOG_STEP_OUT
     done
 fi

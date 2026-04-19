@@ -1,3 +1,12 @@
+# 1. Conditionally replace the APEX based on the SDK version
+if [[ "$SOURCE_PLATFORM_SDK_VERSION" -le 37 ]]; then
+    LOG_STEP_IN "- Replacing btapex from S24+"
+    ADD_TO_WORK_DIR "e2sxxx" "system" "system/apex/com.android.bt.apex" 0 0 644 
+    LOG_STEP_OUT
+    
+    [ -f "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" ] && rm -f "$WORK_DIR/system/system/lib64/libbluetooth_jni.so"
+fi
+
 if [ ! -f "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" ]; then
     LOG_STEP_IN "- Extracting libbluetooth_jni.so from com.android.bt.apex"
 
@@ -27,15 +36,25 @@ if [ ! -f "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" ]; then
     LOG_STEP_OUT
 fi
 
-# Disable VaultKeeper support
-# Before: [tbnz w8, #0, #0xXXXXXX]
-# After: [b #0xXXXXXX]
-if xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "2897773948050037"; then
-    HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" \
-        "2897773948050037" "289777392a000014"
-elif xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "183a009048050037"; then
-    HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" \
-        "183a009048050037" "183a00902a000014"
+LOG_STEP_IN "- Disabling VaultKeeper support"
+if [[ "$SOURCE_PLATFORM_SDK_VERSION" -le 37 ]]; then
+    # S24+ Patching Logic
+    if xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "39d9199428518152"; then
+        HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" "39d9199428518152" "000080d228518152"
+    elif xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "2897773948050037"; then
+        HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" "2897773948050037" "289777392a000014"
+    elif xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "183a009048050037"; then
+        HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" "183a009048050037" "183a00902a000014"
+    else
+        ABORT "No known patch available for the supplied S24 libbluetooth_jni.so"
+    fi
 else
-    ABORT "No known patch available for the supplied libbluetooth_jni.so"
+    if xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "5661756c744b6565706572"; then
+        HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" "5661756c744b6565706572" "289777392a000014"
+    elif xxd -p -c 0 "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" | grep -q "4661756c744b6565706572"; then
+        HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" "4661756c744b6565706572" "183a00902a000014"
+    else
+        ABORT "No known patch available for the supplied standard libbluetooth_jni.so"
+    fi
 fi
+LOG_STEP_OUT

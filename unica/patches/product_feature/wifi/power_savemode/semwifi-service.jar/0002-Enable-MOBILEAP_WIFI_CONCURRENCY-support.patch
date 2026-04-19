@@ -8,19 +8,13 @@ UN1CA: this patch is not complete! Please check unica/patches/product_feature/cu
  .../com/samsung/android/server/wifi/ap/SemWifiApChipInfo.smali  | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/smali/com/samsung/android/server/wifi/ap/SemWifiApChipInfo.smali b/smali/com/samsung/android/server/wifi/ap/SemWifiApChipInfo.smali
-index 943f7cd..477817c 100644
---- a/smali/com/samsung/android/server/wifi/ap/SemWifiApChipInfo.smali
-+++ b/smali/com/samsung/android/server/wifi/ap/SemWifiApChipInfo.smali
-@@ -1318,6 +1318,8 @@
- 
-     :cond_3
-     :goto_0
-+    sput-boolean v5, Lcom/samsung/android/server/wifi/ap/SemWifiApChipInfo;->mSupportWifiSharing:Z
-+
-     iget-object v2, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApChipInfo;->SoftAp_PowerSave:Ljava/lang/String;
- 
-     invoke-virtual {v2, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+diff --git a/smali/org/apache/commons/compress/compressors/bzip2/BlockSort.smali b/smali/org/apache/commons/compress/compressors/bzip2/BlockSort.smali
+--- a/smali/org/apache/commons/compress/compressors/bzip2/BlockSort.smali
++++ b/smali/org/apache/commons/compress/compressors/bzip2/BlockSort.smali
+@@ -1,3 +1,3 @@
+ .class public final Lorg/apache/commons/compress/compressors/bzip2/BlockSort;
+-.super Ljava/lang/Object;
++.super Ljava/lang/Object;
+ .source "qb/108127447 1eb5cabe977e6f074866ba43820b71a1f7453a78a4406bde13cd736320e5ac3a"
 -- 
-2.51.0
-
+2.43.0

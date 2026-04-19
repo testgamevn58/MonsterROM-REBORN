@@ -1,17 +1,8 @@
-From c004d8bedb53106da4faf1e31087e9d0f098de9f Mon Sep 17 00:00:00 2001
-From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Wed, 15 Oct 2025 00:46:38 +0200
-Subject: [PATCH] Allow unlimited storage for Google Photos
-
----
- .../app/ApplicationPackageManager.smali       | 75 ++++++++++++++++---
- 1 file changed, 66 insertions(+), 9 deletions(-)
-
 diff --git a/smali/android/app/ApplicationPackageManager.smali b/smali/android/app/ApplicationPackageManager.smali
-index b3b5a4dd..57833ded 100644
+index 66c0b36f..8fac5b5d 100644
 --- a/smali/android/app/ApplicationPackageManager.smali
 +++ b/smali/android/app/ApplicationPackageManager.smali
-@@ -30,6 +30,8 @@
+@@ -36,6 +36,8 @@
  
  .field private static final greylist-max-o DEFAULT_EPHEMERAL_COOKIE_MAX_SIZE_BYTES:I = 0x4000
  
@@ -19,20 +10,20 @@ index b3b5a4dd..57833ded 100644
 +
  .field private static final blacklist HAS_SYSTEM_FEATURE_API:Ljava/lang/String; = "has_system_feature"
  
- .field private static final blacklist LIVE_ICON_SUFFIX:Ljava/lang/String; = ".LiveIconLoader"
-@@ -209,7 +211,7 @@
+ .field public static final blacklist PERMISSION_CONTROLLER_RESOURCE_PACKAGE:Ljava/lang/String; = "com.android.permissioncontroller"
+@@ -561,7 +563,7 @@
  .end method
  
- .method static constructor blacklist <clinit>()V
+ .method private static blacklist getAndroidManifestParser(Landroid/os/ParcelFileDescriptor;)Landroid/content/res/XmlResourceParser;
 -    .locals 5
 +    .locals 7
+     .annotation system Ldalvik/annotation/Throws;
+         value = {
+             Ljava/io/IOException;
+@@ -607,6 +609,22 @@
+     return-object p0
  
-     new-instance v0, Landroid/util/ArrayMap;
- 
-@@ -255,6 +257,22 @@
- 
-     sput-object v0, Landroid/app/ApplicationPackageManager;->mHasSystemFeatureCache:Landroid/app/PropertyInvalidatedCache;
- 
+     :catchall_0
 +    const-string v0, "com.google.android.feature.GOOGLE_BUILD"
 +
 +    const-string v1, "com.google.android.feature.GOOGLE_EXPERIENCE"
@@ -49,10 +40,10 @@ index b3b5a4dd..57833ded 100644
 +
 +    sput-object v0, Landroid/app/ApplicationPackageManager;->FEATURES_NEXUS:[Ljava/lang/String;
 +
-     new-instance v0, Landroid/app/ApplicationPackageManager$3;
+     move-exception v2
  
-     new-instance v1, Landroid/app/PropertyInvalidatedCache$Args;
-@@ -10449,26 +10467,65 @@
+     invoke-static {v1, v0, v2}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+@@ -10081,26 +10099,65 @@
  .end method
  
  .method public whitelist hasSystemFeature(Ljava/lang/String;I)Z
@@ -122,7 +113,7 @@ index b3b5a4dd..57833ded 100644
  
      invoke-virtual {v0}, Ljava/lang/Boolean;->booleanValue()Z
  
-@@ -10476,10 +10533,10 @@
+@@ -10108,10 +10165,10 @@
  
      return p0
  
@@ -135,7 +126,7 @@ index b3b5a4dd..57833ded 100644
  
      invoke-static {}, Landroid/content/pm/SystemFeaturesCache;->getInstance()Landroid/content/pm/SystemFeaturesCache;
  
-@@ -10489,7 +10546,7 @@
+@@ -10121,7 +10178,7 @@
  
      move-result-object p0
  
@@ -144,7 +135,7 @@ index b3b5a4dd..57833ded 100644
  
      invoke-virtual {p0}, Ljava/lang/Boolean;->booleanValue()Z
  
-@@ -10497,7 +10554,7 @@
+@@ -10129,7 +10186,7 @@
  
      return p0
  
@@ -153,6 +144,3 @@ index b3b5a4dd..57833ded 100644
      sget-object p0, Landroid/app/ApplicationPackageManager;->mHasSystemFeatureCache:Landroid/app/PropertyInvalidatedCache;
  
      new-instance v0, Landroid/app/ApplicationPackageManager$HasSystemFeatureQuery;
--- 
-2.51.1
-

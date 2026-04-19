@@ -1,0 +1,2589 @@
+From f26d40abbf935b2a81064dfff5f7a1263f9f6a41 Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Mon, 13 Oct 2025 14:44:50 +0200
+Subject: [PATCH] Add side fingerprint sensor support
+
+UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
+---
+ .../DualDarInnerLockScreenController.smali    |  126 +-
+ .../KeyguardArrowViewController.smali         |   57 +-
+ .../KeyguardPasswordViewController.smali      |   66 +-
+ ...yguardSecAbsKeyInputViewController$2.smali |    6 +-
+ ...ntroller$OnApplyWindowInsetsListener.smali |   16 +-
+ ...KeyguardSecAbsKeyInputViewController.smali |  658 +--
+ .../KeyguardSecPatternViewController$3.smali  |    6 +-
+ .../KeyguardSecPatternViewController.smali    |  274 +-
+ ...rdSecSecurityContainer$ArrowViewMode.smali |  191 +-
+ ...ntroller$OnApplyWindowInsetsListener.smali |  142 +-
+ ...yguardSecSecurityContainerController.smali |  197 +-
+ .../keyguard/KeyguardSecUpdateMonitor.smali   |   18 +-
+ ...nitorImpl$$ExternalSyntheticLambda11.smali |   23 +-
+ ...nitorImpl$$ExternalSyntheticLambda14.smali |   13 +-
+ ...nitorImpl$$ExternalSyntheticLambda23.smali |   92 +
+ ...nitorImpl$$ExternalSyntheticLambda27.smali |   97 +
+ ...nitorImpl$$ExternalSyntheticLambda28.smali |   56 +-
+ ...nitorImpl$$ExternalSyntheticLambda32.smali |  112 +
+ ...nitorImpl$$ExternalSyntheticLambda39.smali |   86 +
+ ...nitorImpl$$ExternalSyntheticLambda41.smali |   42 +
+ ...onitorImpl$$ExternalSyntheticLambda9.smali |   17 +-
+ .../KeyguardSecUpdateMonitorImpl$1.smali      |    4 +-
+ .../KeyguardSecUpdateMonitorImpl.smali        | 4104 +++++++----------
+ .../keyguard/KeyguardTextBuilder.smali        |  112 +-
+ .../keyguard/KeyguardUpdateMonitor.smali      |    3 -
+ .../SecLockIconViewController$7.smali         |    4 +-
+ .../com/android/keyguard/SecurityUtils.smali  |  120 +-
+ .../android/keyguard/StrongAuthPopup.smali    |  414 +-
+ .../KeyguardBiometricViewController.smali     |  327 +-
+ smali/com/android/systemui/LsRune.smali       |   30 +-
+ .../systemui/biometrics/AuthController.smali  |  368 +-
+ ...fpsAccessibilityOverlayBinder$bind$1.smali |  145 +-
+ .../systemui/doze/DozeScreenState.smali       |  169 +-
+ .../features/GlobalActionFeatures.smali       |   42 +-
+ .../KeyguardFastBioUnlockController.smali     |   65 +-
+ .../keyguard/KeyguardViewMediator.smali       |    2 +-
+ .../keyguard/animator/ActionDownHandler.smali |   68 +-
+ .../animator/ActionUpOrCancelHandler.smali    |  557 ++-
+ .../animator/FullScreenViewController.smali   |   45 +-
+ .../animator/KeyguardTouchAnimator$2.smali    |   71 +-
+ .../animator/KeyguardTouchAnimator.smali      |   26 +-
+ .../KeyguardTouchSecurityInjector.smali       |   89 -
+ ...KeyguardBlueprintViewBinder$bind$1$1.smali |   65 +-
+ ...aultUdfpsAccessibilityOverlaySection.smali |  161 +-
+ .../power/SecPowerNotificationWarnings.smali  |   61 +-
+ .../NotificationPanelViewController.smali     |  100 +-
+ .../systemui/statusbar/DragDownHelper.smali   |  148 +-
+ ...Controller$$ExternalSyntheticLambda3.smali |   55 +-
+ ...cationController$SecKeyguardCallback.smali |  153 +-
+ .../phone/BiometricUnlockController.smali     |  667 ++-
+ .../phone/CentralSurfacesImpl$16.smali        |   23 +-
+ .../statusbar/phone/CentralSurfacesImpl.smali |   33 +-
+ .../phone/KeyguardSecBottomAreaView.smali     |  372 +-
+ .../KeyguardSecBottomAreaViewController.smali |   61 +-
+ .../SecStatusBarKeyguardViewManager$3.smali   |   20 +-
+ .../android/systemui/util/DeviceState.smali   |  152 +-
+ .../android/systemui/util/DeviceType.smali    |   24 +-
+ 57 files changed, 4724 insertions(+), 6431 deletions(-)
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27.smali
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
+
+diff --git a/smali_classes2/com/android/systemui/inputdevice/tutorial/data/repository/DeviceType.smali b/smali_classes2/com/android/systemui/inputdevice/tutorial/data/repository/DeviceType.smali
+--- a/smali_classes2/com/android/systemui/inputdevice/tutorial/data/repository/DeviceType.smali
++++ b/smali_classes2/com/android/systemui/inputdevice/tutorial/data/repository/DeviceType.smali
+@@ -29,7 +29,7 @@
+ 
+     const-string v1, "KEYBOARD"
+ 
+-    const/4 v2, 0x0
++    const/4 v2, 0x1
+ 
+     invoke-direct {v0, v1, v2}, Lcom/android/systemui/inputdevice/tutorial/data/repository/DeviceType;-><init>(Ljava/lang/String;I)V
+ 
+diff --git a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$OnApplyWindowInsetsListener.smali b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$OnApplyWindowInsetsListener.smali
+--- a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$OnApplyWindowInsetsListener.smali
++++ b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$OnApplyWindowInsetsListener.smali
+@@ -56,24 +56,12 @@
+ 
+     iget v0, p0, Lcom/android/keyguard/KeyguardSecAbsKeyInputViewController;->mImeBottom:I
+ 
+-    if-eq v0, p1, :cond_1
++    if-eq v0, p1, :cond_0
+ 
+     iput p1, p0, Lcom/android/keyguard/KeyguardSecAbsKeyInputViewController;->mImeBottom:I
+ 
+-    if-eqz p1, :cond_0
+-
+-    const/4 p1, 0x1
+-
+-    goto :goto_0
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecAbsKeyInputViewController;->updateLayout$1()V
+ 
+     :cond_0
+-    const/4 p1, 0x0
+-
+-    :goto_0
+-    iput-boolean p1, p0, Lcom/android/keyguard/KeyguardSecAbsKeyInputViewController;->mIsImeShown:Z
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecAbsKeyInputViewController;->updateLayout$1()V
+-
+-    :cond_1
+     return-object p2
+ .end method
+diff --git a/smali_classes4/com/android/systemui/util/DeviceState.smali b/smali_classes4/com/android/systemui/util/DeviceState.smali
+--- a/smali_classes4/com/android/systemui/util/DeviceState.smali
++++ b/smali_classes4/com/android/systemui/util/DeviceState.smali
+@@ -2103,163 +2103,15 @@
+ .end method
+ 
+ .method public static isSmartViewDisplayWithFitToAspectRatio(Landroid/content/Context;)Z
+-    .locals 6
+-
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-nez v0, :cond_0
++    .locals 0
++
++    sget-object p0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+ 
+     invoke-static {}, Lcom/android/systemui/util/DeviceState;->isSmartViewFitToActiveDisplay()Z
+ 
+     move-result p0
+ 
+     return p0
+-
+-    :cond_0
+-    const-string v0, "display"
+-
+-    invoke-virtual {p0, v0}, Landroid/content/Context;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
+-
+-    move-result-object v0
+-
+-    check-cast v0, Landroid/hardware/display/DisplayManager;
+-
+-    invoke-virtual {v0}, Landroid/hardware/display/DisplayManager;->semGetWifiDisplayStatus()Landroid/hardware/display/SemWifiDisplayStatus;
+-
+-    move-result-object v0
+-
+-    const/4 v1, 0x1
+-
+-    const/4 v2, 0x0
+-
+-    if-eqz v0, :cond_1
+-
+-    invoke-virtual {v0}, Landroid/hardware/display/SemWifiDisplayStatus;->getActiveDisplayState()I
+-
+-    move-result v0
+-
+-    const/4 v3, 0x2
+-
+-    if-ne v0, v3, :cond_1
+-
+-    move v0, v1
+-
+-    goto :goto_0
+-
+-    :cond_1
+-    move v0, v2
+-
+-    :goto_0
+-    const-string v3, "media_router"
+-
+-    invoke-virtual {p0, v3}, Landroid/content/Context;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
+-
+-    move-result-object v3
+-
+-    check-cast v3, Landroid/media/MediaRouter;
+-
+-    const/4 v4, 0x4
+-
+-    invoke-virtual {v3, v4}, Landroid/media/MediaRouter;->getSelectedRoute(I)Landroid/media/MediaRouter$RouteInfo;
+-
+-    move-result-object v3
+-
+-    invoke-virtual {v3}, Landroid/media/MediaRouter$RouteInfo;->getSupportedTypes()I
+-
+-    move-result v5
+-
+-    and-int/2addr v4, v5
+-
+-    if-eqz v4, :cond_3
+-
+-    invoke-virtual {v3}, Landroid/media/MediaRouter$RouteInfo;->semGetDeviceAddress()Ljava/lang/String;
+-
+-    move-result-object v4
+-
+-    if-nez v4, :cond_3
+-
+-    invoke-virtual {v3}, Landroid/media/MediaRouter$RouteInfo;->semGetStatusCode()I
+-
+-    move-result v4
+-
+-    const/4 v5, 0x6
+-
+-    if-ne v4, v5, :cond_3
+-
+-    invoke-virtual {v3}, Landroid/media/MediaRouter$RouteInfo;->getPresentationDisplay()Landroid/view/Display;
+-
+-    move-result-object v4
+-
+-    if-nez v4, :cond_2
+-
+-    invoke-virtual {v3}, Landroid/media/MediaRouter$RouteInfo;->getDescription()Ljava/lang/CharSequence;
+-
+-    move-result-object v4
+-
+-    if-eqz v4, :cond_3
+-
+-    invoke-virtual {v3}, Landroid/media/MediaRouter$RouteInfo;->getDescription()Ljava/lang/CharSequence;
+-
+-    move-result-object v3
+-
+-    invoke-interface {v3}, Ljava/lang/CharSequence;->toString()Ljava/lang/String;
+-
+-    move-result-object v3
+-
+-    const-string v4, "Audio"
+-
+-    invoke-virtual {v3, v4}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+-
+-    move-result v3
+-
+-    if-eqz v3, :cond_3
+-
+-    :cond_2
+-    move v3, v1
+-
+-    goto :goto_1
+-
+-    :cond_3
+-    move v3, v2
+-
+-    :goto_1
+-    invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
+-
+-    move-result-object p0
+-
+-    const-string v4, "lelink_cast_on"
+-
+-    invoke-static {p0, v4, v2}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+-
+-    move-result p0
+-
+-    if-ne p0, v1, :cond_4
+-
+-    move p0, v1
+-
+-    goto :goto_2
+-
+-    :cond_4
+-    move p0, v2
+-
+-    :goto_2
+-    if-nez v0, :cond_5
+-
+-    if-nez v3, :cond_5
+-
+-    if-eqz p0, :cond_6
+-
+-    :cond_5
+-    invoke-static {}, Lcom/android/systemui/util/DeviceState;->isSmartViewFitToActiveDisplay()Z
+-
+-    move-result p0
+-
+-    if-eqz p0, :cond_6
+-
+-    return v1
+-
+-    :cond_6
+-    return v2
+ .end method
+ 
+ .method public static isSmartViewFitToActiveDisplay()Z
+diff --git a/smali/com/android/keyguard/KeyguardPasswordViewController.smali b/smali/com/android/keyguard/KeyguardPasswordViewController.smali
+--- a/smali/com/android/keyguard/KeyguardPasswordViewController.smali
++++ b/smali/com/android/keyguard/KeyguardPasswordViewController.smali
+@@ -403,7 +403,7 @@
+ .end method
+ 
+ .method public final isHideKeyboardByDefault()Z
+-    .locals 5
++    .locals 3
+ 
+     iget-object v0, p0, Lcom/android/keyguard/KeyguardAbsKeyInputViewController;->mKeyguardUpdateMonitor:Lcom/android/keyguard/KeyguardUpdateMonitor;
+ 
+diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$1.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$1.smali
+--- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$1.smali
++++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$1.smali
+@@ -28,7 +28,9 @@
+ 
+     iget-object p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$1;->this$0:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;
+ 
+-    invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
++    const/4 v0, 0x0
++
++    iput-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
+ 
+     const-string p0, "KeyguardFingerprint"
+ 
+diff --git a/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$SecKeyguardCallback.smali b/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$SecKeyguardCallback.smali
+--- a/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$SecKeyguardCallback.smali
++++ b/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$SecKeyguardCallback.smali
+@@ -391,12 +391,12 @@
+     if-eq p1, p3, :cond_6
+ 
+     :goto_3
+-    move-object v5, p2
++    move-object v6, p2
+ 
+     goto :goto_4
+ 
+     :cond_6
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
+ 
+     const p3, 0x7e130a56
+ 
+@@ -407,7 +407,7 @@
+     goto :goto_3
+ 
+     :cond_7
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
+ 
+     const p3, 0x7e130a52
+ 
+@@ -418,7 +418,7 @@
+     goto :goto_3
+ 
+     :cond_8
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
+ 
+     const p3, 0x7e130a55
+ 
+@@ -429,7 +429,7 @@
+     goto :goto_3
+ 
+     :cond_9
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
+ 
+     const p3, 0x7e130a54
+ 
+@@ -440,7 +440,7 @@
+     goto :goto_3
+ 
+     :cond_a
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
+ 
+     const p3, 0x7e130a50
+ 
+@@ -451,7 +451,7 @@
+     goto :goto_3
+ 
+     :cond_b
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
+ 
+     const p3, 0x7e130a51
+ 
+@@ -462,7 +462,7 @@
+     goto :goto_3
+ 
+     :cond_c
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
+ 
+     const p3, 0x7e130a53
+ 
+@@ -473,7 +473,7 @@
+     goto :goto_3
+ 
+     :goto_4
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardIndicationController;->mContext:Landroid/content/Context;
+ 
+     invoke-virtual {p2}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+ 
+@@ -510,19 +510,19 @@
+ 
+     if-nez p2, :cond_e
+ 
+-    sget-object v3, Lcom/android/systemui/statusbar/IndicationPosition;->UPPER:Lcom/android/systemui/statusbar/IndicationPosition;
+-
+-    sget-object v4, Lcom/android/systemui/statusbar/IndicationEventType;->BIOMETRICS_HELP:Lcom/android/systemui/statusbar/IndicationEventType;
+-
+-    iget-object v6, v2, Lcom/android/systemui/statusbar/KeyguardSecIndicationController;->mErrorColor:Landroid/content/res/ColorStateList;
+-
+-    const/4 v7, 0x0
+-
+-    invoke-virtual/range {v2 .. v7}, Lcom/android/systemui/statusbar/KeyguardSecIndicationController;->addIndicationTimeout(Lcom/android/systemui/statusbar/IndicationPosition;Lcom/android/systemui/statusbar/IndicationEventType;Ljava/lang/CharSequence;Landroid/content/res/ColorStateList;Z)V
+-
+-    iget-object p2, v2, Lcom/android/systemui/statusbar/KeyguardSecIndicationController;->mUpperTextView:Lcom/android/systemui/statusbar/phone/KeyguardIndicationTextView;
+-
+-    invoke-virtual {v2, p2}, Lcom/android/systemui/statusbar/KeyguardSecIndicationController;->showBounceAnimation(Lcom/android/systemui/statusbar/phone/KeyguardIndicationTextView;)V
++    sget-object v4, Lcom/android/systemui/statusbar/IndicationPosition;->UPPER:Lcom/android/systemui/statusbar/IndicationPosition;
++
++    sget-object v5, Lcom/android/systemui/statusbar/IndicationEventType;->BIOMETRICS_HELP:Lcom/android/systemui/statusbar/IndicationEventType;
++
++    iget-object v7, v3, Lcom/android/systemui/statusbar/KeyguardSecIndicationController;->mErrorColor:Landroid/content/res/ColorStateList;
++
++    const/4 v8, 0x0
++
++    invoke-virtual/range {v3 .. v8}, Lcom/android/systemui/statusbar/KeyguardSecIndicationController;->addIndicationTimeout(Lcom/android/systemui/statusbar/IndicationPosition;Lcom/android/systemui/statusbar/IndicationEventType;Ljava/lang/CharSequence;Landroid/content/res/ColorStateList;Z)V
++
++    iget-object p2, v3, Lcom/android/systemui/statusbar/KeyguardSecIndicationController;->mUpperTextView:Lcom/android/systemui/statusbar/phone/KeyguardIndicationTextView;
++
++    invoke-virtual {v3, p2}, Lcom/android/systemui/statusbar/KeyguardSecIndicationController;->showBounceAnimation(Lcom/android/systemui/statusbar/phone/KeyguardIndicationTextView;)V
+ 
+     goto :goto_5
+ 
+diff --git a/smali/com/android/keyguard/KeyguardSecPatternViewController.smali b/smali/com/android/keyguard/KeyguardSecPatternViewController.smali
+--- a/smali/com/android/keyguard/KeyguardSecPatternViewController.smali
++++ b/smali/com/android/keyguard/KeyguardSecPatternViewController.smali
+@@ -2355,7 +2355,7 @@
+ .end method
+ 
+ .method public final updatePortraitLayout()V
+-    .locals 11
++    .locals 9
+ 
+     iget-object v0, p0, Lcom/android/keyguard/KeyguardPatternViewController;->mKeyguardUpdateMonitor:Lcom/android/keyguard/KeyguardUpdateMonitor;
+ 
+diff --git a/smali/com/android/keyguard/KeyguardArrowViewController.smali b/smali/com/android/keyguard/KeyguardArrowViewController.smali
+--- a/smali/com/android/keyguard/KeyguardArrowViewController.smali
++++ b/smali/com/android/keyguard/KeyguardArrowViewController.smali
+@@ -901,7 +901,7 @@
+ 
+     const/4 v4, 0x0
+ 
+-    if-eqz v3, :cond_10
++    if-eqz v3, :cond_f
+ 
+     invoke-static {}, Lcom/android/systemui/util/DeviceState;->isSmartViewFitToActiveDisplay()Z
+ 
+@@ -1222,9 +1222,9 @@
+ 
+     move-result v6
+ 
+-    if-eqz v6, :cond_e
+-
+-    if-eqz v5, :cond_d
++    if-eqz v6, :cond_d
++
++    if-eqz v5, :cond_c
+ 
+     const v5, 0x7e070682
+ 
+@@ -1234,29 +1234,29 @@
+ 
+     goto :goto_7
+ 
++    :cond_c
++    invoke-virtual {p0}, Lcom/android/systemui/util/ViewController;->getContext()Landroid/content/Context;
++
++    move-result-object v4
++
++    invoke-static {v4}, Lcom/android/keyguard/SecurityUtils;->getTabletPINContainerHeight(Landroid/content/Context;)I
++
++    move-result v4
++
++    goto :goto_7
++
+     :cond_d
+-    invoke-virtual {p0}, Lcom/android/systemui/util/ViewController;->getContext()Landroid/content/Context;
+-
+-    move-result-object v4
+-
+-    invoke-static {v4}, Lcom/android/keyguard/SecurityUtils;->getTabletPINContainerHeight(Landroid/content/Context;)I
++    if-eqz v5, :cond_e
++
++    const v5, 0x7e070681
++
++    invoke-virtual {v4, v5}, Landroid/content/res/Resources;->getDimensionPixelSize(I)I
+ 
+     move-result v4
+ 
+     goto :goto_7
+ 
+     :cond_e
+-    if-eqz v5, :cond_f
+-
+-    const v5, 0x7e070681
+-
+-    invoke-virtual {v4, v5}, Landroid/content/res/Resources;->getDimensionPixelSize(I)I
+-
+-    move-result v4
+-
+-    goto :goto_7
+-
+-    :cond_f
+     invoke-virtual {p0}, Lcom/android/systemui/util/ViewController;->getContext()Landroid/content/Context;
+ 
+     move-result-object v4
+@@ -1282,7 +1282,7 @@
+ 
+     goto :goto_9
+ 
+-    :cond_10
++    :cond_f
+     :goto_8
+     iput v4, v1, Landroid/widget/FrameLayout$LayoutParams;->leftMargin:I
+ 
+diff --git a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$2.smali b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$2.smali
+--- a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$2.smali
++++ b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$2.smali
+@@ -251,11 +251,7 @@
+     invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecAbsKeyInputViewController;->displayDefaultSecurityMessage()V
+ 
+     :cond_0
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz v0, :cond_1
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecAbsKeyInputViewController;->updateLayout$1()V
++    sget-object p0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+ 
+     :cond_1
+     return-void
+diff --git a/smali/com/android/keyguard/StrongAuthPopup.smali b/smali/com/android/keyguard/StrongAuthPopup.smali
+--- a/smali/com/android/keyguard/StrongAuthPopup.smali
++++ b/smali/com/android/keyguard/StrongAuthPopup.smali
+@@ -526,7 +526,7 @@
+     goto :goto_2
+ 
+     :cond_3
+-    if-eq v0, v10, :cond_5
++    if-eq v0, v9, :cond_5
+ 
+     if-ne v0, v8, :cond_4
+ 
+diff --git a/smali/com/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener.smali b/smali/com/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener.smali
+--- a/smali/com/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener.smali
++++ b/smali/com/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener.smali
+@@ -42,17 +42,15 @@
+ 
+     move-result p1
+ 
+-    const/4 v0, 0x1
+-
+-    const/4 v1, 0x0
+-
+-    if-eqz p1, :cond_7
++    const/4 v0, 0x0
++
++    if-eqz p1, :cond_6
+ 
+     sget-boolean p1, Lcom/android/systemui/LsRune;->SECURITY_NAVBAR_ENABLED:Z
+ 
+     if-eqz p1, :cond_0
+ 
+-    move p1, v1
++    move p1, v0
+ 
+     goto :goto_0
+ 
+@@ -70,41 +68,43 @@
+     :goto_0
+     invoke-static {}, Landroid/view/WindowInsets$Type;->ime()I
+ 
+-    move-result v2
+-
+-    invoke-virtual {p2, v2}, Landroid/view/WindowInsets;->getInsets(I)Landroid/graphics/Insets;
++    move-result v1
++
++    invoke-virtual {p2, v1}, Landroid/view/WindowInsets;->getInsets(I)Landroid/graphics/Insets;
++
++    move-result-object v1
++
++    iget v1, v1, Landroid/graphics/Insets;->bottom:I
++
++    iget-object v2, p0, Lcom/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener;->this$0:Lcom/android/keyguard/KeyguardSecSecurityContainerController;
++
++    iget v3, v2, Lcom/android/keyguard/KeyguardSecSecurityContainerController;->mImeBottom:I
++
++    if-eq v3, v1, :cond_5
++
++    iput v1, v2, Lcom/android/keyguard/KeyguardSecSecurityContainerController;->mImeBottom:I
++
++    const/4 v3, 0x1
++
++    if-eqz v1, :cond_1
++
++    move v4, v3
++
++    goto :goto_1
++
++    :cond_1
++    move v4, v0
++
++    :goto_1
++    iput-boolean v4, v2, Lcom/android/keyguard/KeyguardSecSecurityContainerController;->mIsImeShown:Z
++
++    invoke-virtual {v2}, Lcom/android/keyguard/KeyguardSecSecurityContainerController;->updateLayoutMargins()V
++
++    iget-object v2, p0, Lcom/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener;->this$0:Lcom/android/keyguard/KeyguardSecSecurityContainerController;
++
++    invoke-virtual {v2}, Lcom/android/systemui/util/ViewController;->getContext()Landroid/content/Context;
+ 
+     move-result-object v2
+-
+-    iget v2, v2, Landroid/graphics/Insets;->bottom:I
+-
+-    iget-object v3, p0, Lcom/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener;->this$0:Lcom/android/keyguard/KeyguardSecSecurityContainerController;
+-
+-    iget v4, v3, Lcom/android/keyguard/KeyguardSecSecurityContainerController;->mImeBottom:I
+-
+-    if-eq v4, v2, :cond_6
+-
+-    iput v2, v3, Lcom/android/keyguard/KeyguardSecSecurityContainerController;->mImeBottom:I
+-
+-    if-eqz v2, :cond_1
+-
+-    move v4, v0
+-
+-    goto :goto_1
+-
+-    :cond_1
+-    move v4, v1
+-
+-    :goto_1
+-    iput-boolean v4, v3, Lcom/android/keyguard/KeyguardSecSecurityContainerController;->mIsImeShown:Z
+-
+-    invoke-virtual {v3}, Lcom/android/keyguard/KeyguardSecSecurityContainerController;->updateLayoutMargins()V
+-
+-    iget-object v3, p0, Lcom/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener;->this$0:Lcom/android/keyguard/KeyguardSecSecurityContainerController;
+-
+-    invoke-virtual {v3}, Lcom/android/systemui/util/ViewController;->getContext()Landroid/content/Context;
+-
+-    move-result-object v3
+ 
+     iget-object v4, p0, Lcom/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener;->this$0:Lcom/android/keyguard/KeyguardSecSecurityContainerController;
+ 
+@@ -259,9 +259,9 @@
+ 
+     move-result p0
+ 
+-    invoke-virtual {v0, v2, v3, p0, p1}, Landroid/view/ViewGroup;->setPadding(IIII)V
+-
+-    invoke-virtual {p2, v1, v1, v1, p1}, Landroid/view/WindowInsets;->inset(IIII)Landroid/view/WindowInsets;
++    invoke-virtual {v1, v2, v3, p0, p1}, Landroid/view/ViewGroup;->setPadding(IIII)V
++
++    invoke-virtual {p2, v0, v0, v0, p1}, Landroid/view/WindowInsets;->inset(IIII)Landroid/view/WindowInsets;
+ 
+     move-result-object p0
+ 
+diff --git a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController.smali b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController.smali
+--- a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController.smali
++++ b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController.smali
+@@ -45,8 +45,6 @@
+ .field public final mInterpolator:Landroid/view/animation/PathInterpolator;
+ 
+ .field public mIsFaceRunning:Z
+-
+-.field public mIsImeShown:Z
+ 
+ .field public final mKeyguardTextBuilder:Lcom/android/keyguard/KeyguardTextBuilder;
+ 
+diff --git a/smali/com/android/keyguard/DualDarInnerLockScreenController.smali b/smali/com/android/keyguard/DualDarInnerLockScreenController.smali
+--- a/smali/com/android/keyguard/DualDarInnerLockScreenController.smali
++++ b/smali/com/android/keyguard/DualDarInnerLockScreenController.smali
+@@ -375,18 +375,18 @@
+ 
+     goto :goto_2
+ 
++    :cond_3
++    iget-boolean v0, p0, Lcom/android/keyguard/DualDarInnerLockScreenController;->mIsPassword:Z
++
++    if-eqz v0, :cond_4
++
++    iget-boolean v0, p0, Lcom/android/keyguard/DualDarInnerLockScreenController;->mIsImeShown:Z
++
++    if-eqz v0, :cond_4
++
++    goto :goto_1
++
+     :cond_4
+-    iget-boolean v0, p0, Lcom/android/keyguard/DualDarInnerLockScreenController;->mIsPassword:Z
+-
+-    if-eqz v0, :cond_5
+-
+-    iget-boolean v0, p0, Lcom/android/keyguard/DualDarInnerLockScreenController;->mIsImeShown:Z
+-
+-    if-eqz v0, :cond_5
+-
+-    goto :goto_1
+-
+-    :cond_5
+     iget v6, p0, Lcom/android/keyguard/DualDarInnerLockScreenController;->mNavigationBarHeight:I
+ 
+     goto :goto_1
+@@ -406,7 +406,7 @@
+ 
+     return-void
+ 
+-    :cond_6
++    :cond_5
+     move-object v4, p0
+ 
+     move-object v8, p1
+diff --git a/smali/com/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode.smali b/smali/com/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode.smali
+--- a/smali/com/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode.smali
++++ b/smali/com/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode.smali
+@@ -98,7 +98,7 @@
+ .end method
+ 
+ .method public final updateSecurityViewPosition(IZ)V
+-    .locals 9
++    .locals 8
+ 
+     if-eqz p2, :cond_0
+ 
+@@ -139,21 +139,21 @@
+     :goto_0
+     invoke-virtual {p2, v0}, Landroid/content/res/Resources;->getDimensionPixelSize(I)I
+ 
+-    move-result v0
+-
+-    iget-object v2, p0, Lcom/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode;->mView:Lcom/android/keyguard/KeyguardSecSecurityContainer;
+-
+-    invoke-virtual {v2}, Landroid/view/ViewGroup;->getContext()Landroid/content/Context;
+-
+-    move-result-object v2
+-
+-    invoke-static {v2}, Lcom/android/systemui/util/DeviceState;->shouldEnableKeyguardScreenRotation(Landroid/content/Context;)Z
+-
+-    move-result v2
+-
+-    const/4 v3, 0x0
+-
+-    if-eqz v2, :cond_2
++    move-result v6
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode;->mView:Lcom/android/keyguard/KeyguardSecSecurityContainer;
++
++    invoke-virtual {v0}, Landroid/view/ViewGroup;->getContext()Landroid/content/Context;
++
++    move-result-object v0
++
++    invoke-static {v0}, Lcom/android/systemui/util/DeviceState;->shouldEnableKeyguardScreenRotation(Landroid/content/Context;)Z
++
++    move-result v0
++
++    const/4 v2, 0x0
++
++    if-eqz v0, :cond_2
+ 
+     invoke-virtual {p2}, Landroid/content/res/Resources;->getConfiguration()Landroid/content/res/Configuration;
+ 
+@@ -359,10 +359,10 @@
+ 
+     invoke-virtual/range {v1 .. v6}, Landroidx/constraintlayout/widget/ConstraintSet;->connect(IIIII)V
+ 
+-    goto :goto_a
+-
+-    :cond_d
+-    if-ne p1, v5, :cond_e
++    goto :goto_4
++
++    :cond_6
++    if-ne p1, v3, :cond_7
+ 
+     iget-object p1, p0, Lcom/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode;->mViewFlipper:Lcom/android/keyguard/KeyguardSecurityViewFlipper;
+ 
+@@ -378,16 +378,16 @@
+ 
+     invoke-virtual/range {v1 .. v6}, Landroidx/constraintlayout/widget/ConstraintSet;->connect(IIIII)V
+ 
+-    goto :goto_a
+-
+-    :cond_e
++    goto :goto_4
++
++    :cond_7
+     iget-object p1, p0, Lcom/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode;->mViewFlipper:Lcom/android/keyguard/KeyguardSecurityViewFlipper;
+ 
+     invoke-virtual {p1}, Landroid/widget/ViewFlipper;->getId()I
+ 
+     move-result p1
+ 
+-    invoke-virtual {v1, p1, v4, v3, v4}, Landroidx/constraintlayout/widget/ConstraintSet;->connect(IIII)V
++    invoke-virtual {v1, p1, v0, v2, v0}, Landroidx/constraintlayout/widget/ConstraintSet;->connect(IIII)V
+ 
+     iget-object p1, p0, Lcom/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode;->mViewFlipper:Lcom/android/keyguard/KeyguardSecurityViewFlipper;
+ 
+@@ -395,9 +395,9 @@
+ 
+     move-result p1
+ 
+-    invoke-virtual {v1, p1, v5, v3, v5}, Landroidx/constraintlayout/widget/ConstraintSet;->connect(IIII)V
+-
+-    :goto_a
++    invoke-virtual {v1, p1, v3, v2, v3}, Landroidx/constraintlayout/widget/ConstraintSet;->connect(IIII)V
++
++    :goto_4
+     iget-object p1, p0, Lcom/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode;->mViewFlipper:Lcom/android/keyguard/KeyguardSecurityViewFlipper;
+ 
+     invoke-virtual {p1}, Landroid/widget/ViewFlipper;->getId()I
+@@ -410,7 +410,7 @@
+ 
+     const/4 v3, 0x4
+ 
+-    move v6, v0
++    move v6, v7
+ 
+     invoke-virtual/range {v1 .. v6}, Landroidx/constraintlayout/widget/ConstraintSet;->connect(IIIII)V
+ 
+diff --git a/smali/com/android/keyguard/biometrics/KeyguardBiometricViewController.smali b/smali/com/android/keyguard/biometrics/KeyguardBiometricViewController.smali
+--- a/smali/com/android/keyguard/biometrics/KeyguardBiometricViewController.smali
++++ b/smali/com/android/keyguard/biometrics/KeyguardBiometricViewController.smali
+@@ -672,7 +672,7 @@
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_1
++    if-eqz v0, :cond_3
+ 
+     invoke-virtual {p0}, Lcom/android/systemui/util/ViewController;->getResources()Landroid/content/res/Resources;
+ 
+@@ -1170,7 +1170,7 @@
+ .end method
+ 
+ .method public final updateBiometricViewLayout()V
+-    .locals 15
++    .locals 14
+ 
+     iget-object v0, p0, Lcom/android/keyguard/biometrics/KeyguardBiometricViewController;->keyguardUpdateMonitor:Lcom/android/keyguard/KeyguardUpdateMonitor;
+ 
+@@ -1657,8 +1657,8 @@
+ 
+     return-void
+ 
+-    :cond_d
+-    :goto_6
++    :cond_6
++    :goto_4
+     invoke-virtual {p0}, Lcom/android/keyguard/biometrics/KeyguardBiometricViewController;->updateLockContainerMargin$1()V
+ 
+     iget-object p0, p0, Lcom/android/systemui/util/ViewController;->mView:Landroid/view/View;
+diff --git a/smali/com/android/systemui/LsRune.smali b/smali/com/android/systemui/LsRune.smali
+--- a/smali/com/android/systemui/LsRune.smali
++++ b/smali/com/android/systemui/LsRune.smali
+@@ -128,11 +128,9 @@
+ 
+ .field public static final SECURITY_ESIM:Z
+ 
+-.field public static final SECURITY_FINGERPRINT_GUIDE_POPUP:Z
+-
+ .field public static final SECURITY_FINGERPRINT_HOME:Z
+ 
+-.field public static final SECURITY_FINGERPRINT_IN_DISPLAY:Z
++.field public static final SECURITY_FINGERPRINT_SIDE:Z
+ 
+ .field public static final SECURITY_HAPTIC_FEEDBACK_ON_DC_MOTOR:Z
+ 
+@@ -747,7 +745,7 @@
+ 
+     sput-boolean v2, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_HOME:Z
+ 
+-    sput-boolean v3, Lcom/android/systemui/LsRune;->SECURITY_BACKGROUND_AUTHENTICATION:Z
++    sput-boolean v2, Lcom/android/systemui/LsRune;->SECURITY_BACKGROUND_AUTHENTICATION:Z
+ 
+     const-string v2, "SEC_FLOATING_FEATURE_LOCKSCREEN_CONFIG_PUNCHHOLE_VI"
+ 
+diff --git a/smali/com/android/keyguard/KeyguardSecPatternViewController$3.smali b/smali/com/android/keyguard/KeyguardSecPatternViewController$3.smali
+--- a/smali/com/android/keyguard/KeyguardSecPatternViewController$3.smali
++++ b/smali/com/android/keyguard/KeyguardSecPatternViewController$3.smali
+@@ -164,11 +164,7 @@
+     invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecPatternViewController;->displayDefaultSecurityMessage()V
+ 
+     :cond_0
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz v0, :cond_1
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecPatternViewController;->updateLayout$2()V
++    sget-object p0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+ 
+     :cond_1
+     return-void
+diff --git a/smali/com/android/keyguard/KeyguardTextBuilder.smali b/smali/com/android/keyguard/KeyguardTextBuilder.smali
+--- a/smali/com/android/keyguard/KeyguardTextBuilder.smali
++++ b/smali/com/android/keyguard/KeyguardTextBuilder.smali
+@@ -1385,7 +1385,7 @@
+     :goto_3
+     iput-boolean v2, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mIsFace:Z
+ 
+-    if-nez p1, :cond_d
++    if-nez p1, :cond_b
+ 
+     if-eqz v6, :cond_4
+ 
+@@ -1508,26 +1508,54 @@
+ 
+     move-result p1
+ 
+-    if-eqz p1, :cond_c
++    if-eqz p1, :cond_a
+ 
+     move v3, v4
+ 
+-    :cond_c
++    :cond_a
+     iput-boolean v3, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mIsFace:Z
+ 
+-    :cond_d
++    :cond_b
+     :goto_7
+     iget-boolean p1, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mIsFingerprint:Z
+ 
+     const-string v0, "none"
+ 
++    if-eqz p1, :cond_c
++
++    iget-boolean v2, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mIsFace:Z
++
++    if-eqz v2, :cond_c
++
++    sget-object p1, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->MultiBiometrics:Lcom/android/keyguard/KeyguardTextBuilder$Biometric;
++
++    invoke-virtual {p1}, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->getType()Ljava/lang/String;
++
++    move-result-object p1
++
++    iput-object p1, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mBiometricType:Ljava/lang/String;
++
++    goto :goto_8
++
++    :cond_c
++    if-eqz p1, :cond_d
++
++    sget-object p1, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->Fingerprint:Lcom/android/keyguard/KeyguardTextBuilder$Biometric;
++
++    invoke-virtual {p1}, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->getType()Ljava/lang/String;
++
++    move-result-object p1
++
++    iput-object p1, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mBiometricType:Ljava/lang/String;
++
++    goto :goto_8
++
++    :cond_d
++    iget-boolean p1, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mIsFace:Z
++
+     if-eqz p1, :cond_e
+ 
+-    iget-boolean v2, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mIsFace:Z
+-
+-    if-eqz v2, :cond_e
+-
+-    sget-object p1, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->MultiBiometrics:Lcom/android/keyguard/KeyguardTextBuilder$Biometric;
++    sget-object p1, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->Face:Lcom/android/keyguard/KeyguardTextBuilder$Biometric;
+ 
+     invoke-virtual {p1}, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->getType()Ljava/lang/String;
+ 
+@@ -1538,34 +1566,6 @@
+     goto :goto_8
+ 
+     :cond_e
+-    if-eqz p1, :cond_f
+-
+-    sget-object p1, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->Fingerprint:Lcom/android/keyguard/KeyguardTextBuilder$Biometric;
+-
+-    invoke-virtual {p1}, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->getType()Ljava/lang/String;
+-
+-    move-result-object p1
+-
+-    iput-object p1, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mBiometricType:Ljava/lang/String;
+-
+-    goto :goto_8
+-
+-    :cond_f
+-    iget-boolean p1, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mIsFace:Z
+-
+-    if-eqz p1, :cond_10
+-
+-    sget-object p1, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->Face:Lcom/android/keyguard/KeyguardTextBuilder$Biometric;
+-
+-    invoke-virtual {p1}, Lcom/android/keyguard/KeyguardTextBuilder$Biometric;->getType()Ljava/lang/String;
+-
+-    move-result-object p1
+-
+-    iput-object p1, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mBiometricType:Ljava/lang/String;
+-
+-    goto :goto_8
+-
+-    :cond_10
+     iput-object v0, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mBiometricType:Ljava/lang/String;
+ 
+     :goto_8
+@@ -1596,7 +1596,7 @@
+ 
+     const-string v0, "prev"
+ 
+-    :cond_12
++    :cond_10
+     iput-object v0, p0, Lcom/android/keyguard/KeyguardTextBuilder;->mDismissActionType:Ljava/lang/String;
+ 
+     return-void
+diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
+--- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
++++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
+@@ -48,8 +48,6 @@
+ 
+ .field public mCurrentSecurityMode:Lcom/android/keyguard/KeyguardSecurityModel$SecurityMode;
+ 
+-.field public final mDesktopManagerLazy:Ldagger/Lazy;
+-
+ .field public mDeviceOwnerInfoText:Ljava/lang/String;
+ 
+ .field public final mDevicePolicyManager:Landroid/app/admin/DevicePolicyManager;
+@@ -84,8 +82,6 @@
+ 
+ .field public mForceStartFinger:Z
+ 
+-.field public mFpInDisplayState:I
+-
+ .field public final mFpMaskToken:Landroid/os/IBinder;
+ 
+ .field public final mFpMessages:Ljava/util/concurrent/ConcurrentLinkedQueue;
+@@ -114,8 +110,6 @@
+ 
+ .field public mIsEarlyWakeUp:Z
+ 
+-.field public mIsFODStrictMode:Z
+-
+ .field public mIsFPCanceledByForegroundApp:Z
+ 
+ .field public mIsFPCanceledByProximity:Z
+@@ -136,8 +130,6 @@
+ 
+ .field public mIsOwnerInfoEnabled:Z
+ 
+-.field public mIsPanelExpandingStarted:Z
+-
+ .field public mIsQsFullyExpanded:Z
+ 
+ .field public mIsRunningBlackMemo:Z
+@@ -146,6 +138,10 @@
+ 
+ .field public mIsShortcutLaunchInProgress:Z
+ 
++.field public mIsShowingKeepScreenOnPopup:Z
++
++.field public mIsSkipFPResponse:Z
++
+ .field public mIsStartFacePossible:Z
+ 
+ .field public mIsTspFpGuideShown:Z
+@@ -202,8 +198,6 @@
+ 
+ .field public mRemoteLockSimulationInfo:Lcom/android/internal/widget/RemoteLockInfo;
+ 
+-.field public mSIPShown:Z
+-
+ .field public mScreenOrientationNoSensorValue:Z
+ 
+ .field public final mSecSecureStateInteractor:Ljavax/inject/Provider;
+@@ -235,8 +229,6 @@
+ .field public final mViewMediatorCallbackLazy:Ldagger/Lazy;
+ 
+ .field public final mWaitingFocusRunnable:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda15;
+-
+-.field public final mWindowManagerService:Landroid/view/IWindowManager;
+ 
+ 
+ # direct methods
+@@ -721,10 +713,6 @@
+ 
+     iput-object v8, v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mBackgroundExecutor:Ljava/util/concurrent/Executor;
+ 
+-    move-object/from16 v2, p10
+-
+-    iput-object v2, v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mDesktopManagerLazy:Ldagger/Lazy;
+-
+     move-object/from16 v2, p5
+ 
+     iput-object v2, v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mLooperSlowLogController:Lcom/android/systemui/uithreadmonitor/LooperSlowLogController;
+@@ -1059,15 +1047,8 @@
+ 
+     invoke-virtual {v6, v0, v2}, Lcom/android/systemui/broadcast/BroadcastDispatcher;->registerReceiver(Landroid/content/IntentFilter;Landroid/content/BroadcastReceiver;)V
+ 
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz v0, :cond_3
+-
+-    move-object/from16 v2, p13
+-
+-    iput-object v2, v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mWindowManagerService:Landroid/view/IWindowManager;
+-
+-    :cond_3
++    sget-object v0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
++
+     move-object/from16 v2, p14
+ 
+     iput-object v2, v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mKeyguardEditModeControllerLazy:Ldagger/Lazy;
+@@ -1206,9 +1187,7 @@
+ 
+     invoke-virtual {v1, v0}, Landroid/util/SparseIntArray;->delete(I)V
+ 
+-    const/4 v1, 0x0
+-
+-    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setFodStrictMode(Z)V
++    sget-object v1, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+ 
+     :cond_1
+     const-class v1, Lcom/android/systemui/UiOffloadThread;
+@@ -5229,7 +5208,7 @@
+ .end method
+ 
+ .method public final handleFingerprintAcquired(I)V
+-    .locals 5
++    .locals 6
+ 
+     invoke-static {}, Lcom/android/systemui/util/Assert;->isMainThread()V
+ 
+@@ -5255,20 +5234,20 @@
+ 
+     const/4 v0, 0x0
+ 
+-    const/4 v1, 0x1
+-
+-    const/16 v2, 0x2712
+-
+-    if-eq p1, v2, :cond_1
+-
+-    const/16 v3, 0x2714
+-
+-    if-eq p1, v3, :cond_0
++    const/4 v2, 0x1
++
++    const/16 v3, 0x2712
++
++    if-eq p1, v3, :cond_1
++
++    const/16 v4, 0x2714
++
++    if-eq p1, v4, :cond_0
+ 
+     goto :goto_0
+ 
+     :cond_0
+-    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsFpLeave:Z
++    iput-boolean v2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsFpLeave:Z
+ 
+     goto :goto_0
+ 
+@@ -5323,13 +5302,13 @@
+ 
+     return-void
+ 
+-    :cond_3
+-    if-eqz p1, :cond_5
+-
+     :cond_4
++    if-eqz p1, :cond_6
++
++    :cond_5
+     return-void
+ 
+-    :cond_5
++    :cond_6
+     new-instance v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda19;
+ 
+     const/4 v2, 0x3
+@@ -5346,78 +5325,120 @@
+ .end method
+ 
+ .method public final handleFingerprintAuthFailed()V
++    .locals 3
++
++    invoke-static {}, Lcom/android/systemui/util/Assert;->isMainThread()V
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mUserTracker:Lcom/android/systemui/settings/UserTracker;
++
++    check-cast v0, Lcom/android/systemui/settings/UserTrackerImpl;
++
++    invoke-virtual {v0}, Lcom/android/systemui/settings/UserTrackerImpl;->getUserId()I
++
++    move-result v0
++
++    iget-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    const-string v2, "KeyguardFingerprint"
++
++    if-eqz v1, :cond_0
++
++    const/4 v0, 0x0
++
++    iput-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    const-string p0, "handleFingerprintAuthFailed( skipped FP response )"
++
++    invoke-static {v2, p0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
++
++    return-void
++
++    :cond_0
++    const/4 v1, 0x1
++
++    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isUnlockingWithBiometricAllowed(Z)Z
++
++    move-result v1
++
++    if-nez v1, :cond_1
++
++    const-string p0, "handleFingerprintAuthFailed( unlock is not allowed. )"
++
++    invoke-static {v2, p0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
++
++    return-void
++
++    :cond_1
++    invoke-virtual {p0, v0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->reportFailedBiometricUnlockAttempt(I)V
++
++    new-instance v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda12;
++
++    const/4 v1, 0x3
++
++    invoke-direct {v0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda12;-><init>(I)V
++
++    const/4 v1, 0x0
++
++    invoke-virtual {p0, v0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->dispatchCallback(Ljava/util/function/Consumer;Ljava/lang/String;)V
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mContext:Landroid/content/Context;
++
++    const v1, 0x7e130a5a
++
++    invoke-virtual {v0, v1}, Landroid/content/Context;->getString(I)Ljava/lang/String;
++
++    move-result-object v0
++
++    const/4 v1, -0x1
++
++    invoke-virtual {p0, v1, v0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->handleFingerprintHelp(ILjava/lang/String;)V
++
++    return-void
++.end method
++
++.method public final handleFingerprintAuthenticated(IZ)V
+     .locals 2
+ 
+-    invoke-static {}, Lcom/android/systemui/util/Assert;->isMainThread()V
+-
+-    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mUserTracker:Lcom/android/systemui/settings/UserTracker;
+-
+-    check-cast v0, Lcom/android/systemui/settings/UserTrackerImpl;
+-
+-    invoke-virtual {v0}, Lcom/android/systemui/settings/UserTrackerImpl;->getUserId()I
+-
+-    move-result v0
+-
+-    const/4 v1, 0x1
+-
+-    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isUnlockingWithBiometricAllowed(Z)Z
+-
+-    move-result v1
+-
+-    if-nez v1, :cond_0
+-
+-    const-string p0, "handleFingerprintAuthFailed( unlock is not allowed. )"
+-
+-    const-string v0, "KeyguardFingerprint"
+-
+-    invoke-static {v0, p0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
++    iget-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    const/4 v1, 0x0
++
++    if-eqz v0, :cond_0
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    const-string p1, "KeyguardFingerprint"
++
++    const-string p2, "handleFingerprintAuthenticated( skipped FP response )"
++
++    invoke-static {p1, p2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
++
++    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardUpdateMonitor;->setFingerprintRunningState(I)V
++
++    const/4 p1, 0x0
++
++    iput-object p1, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mFingerprintCancelSignal:Landroid/os/CancellationSignal;
++
++    const/4 p1, 0x2
++
++    invoke-virtual {p0, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->updateFingerprintListeningState(I)V
++
++    invoke-static {}, Landroid/os/Trace;->endSection()V
+ 
+     return-void
+ 
+     :cond_0
+-    invoke-virtual {p0, v0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->reportFailedBiometricUnlockAttempt(I)V
+-
+-    new-instance v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda12;
+-
+-    const/4 v1, 0x3
+-
+-    invoke-direct {v0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda12;-><init>(I)V
+-
+-    const/4 v1, 0x0
+-
+-    invoke-virtual {p0, v0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->dispatchCallback(Ljava/util/function/Consumer;Ljava/lang/String;)V
+-
+-    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mContext:Landroid/content/Context;
+-
+-    const v1, 0x7e130a5a
+-
+-    invoke-virtual {v0, v1}, Landroid/content/Context;->getString(I)Ljava/lang/String;
+-
+-    move-result-object v0
+-
+-    const/4 v1, -0x1
+-
+-    invoke-virtual {p0, v1, v0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->handleFingerprintHelp(ILjava/lang/String;)V
+-
+-    return-void
+-.end method
+-
+-.method public final handleFingerprintAuthenticated(IZ)V
+-    .locals 1
+-
+     sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_SUB_DISPLAY_COVER:Z
+ 
+-    if-eqz v0, :cond_0
+-
+-    const/4 v0, 0x0
+-
+-    iput-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mForceStartFinger:Z
+-
+-    iput-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubBioAuth:Z
+-
+-    iput-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubWofFpAuth:Z
+-
+-    :cond_0
++    if-eqz v0, :cond_1
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mForceStartFinger:Z
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubBioAuth:Z
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubWofFpAuth:Z
++
++    :cond_1
+     invoke-super {p0, p1, p2}, Lcom/android/keyguard/KeyguardUpdateMonitor;->handleFingerprintAuthenticated(IZ)V
+ 
+     return-void
+@@ -5734,7 +5755,7 @@
+ 
+     move-result v1
+ 
+-    if-eqz v1, :cond_5
++    if-eqz v1, :cond_6
+ 
+     iget-object v1, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mContext:Landroid/content/Context;
+ 
+@@ -6131,7 +6152,7 @@
+ 
+     new-instance v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda15;
+ 
+-    const/16 v2, 0x8
++    const/4 v2, 0x7
+ 
+     invoke-direct {v1, v2}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda15;-><init>(I)V
+ 
+@@ -6386,51 +6407,40 @@
+     invoke-virtual {p0, p1, v3}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->dispatchCallback(Ljava/util/function/Consumer;Ljava/lang/String;)V
+ 
+     :cond_9
+-    sget-boolean p1, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz p1, :cond_a
+-
+-    iget-object p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpm:Landroid/hardware/fingerprint/FingerprintManager;
+-
+-    if-eqz p1, :cond_a
+-
+-    iget-boolean v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mPrimaryBouncerFullyShown:Z
+-
+-    invoke-virtual {p1, v0}, Landroid/hardware/fingerprint/FingerprintManager;->semShowBouncerScreen(I)I
++    sget-object p1, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->isKeyguardVisible()Z
++
++    move-result p1
++
++    if-nez p1, :cond_a
++
++    iget-boolean p1, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mPrimaryBouncerFullyShown:Z
++
++    if-nez p1, :cond_a
++
++    invoke-virtual {p0, v2}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setUnlockingKeyguard(Z)V
+ 
+     :cond_a
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->isKeyguardVisible()Z
+-
+-    move-result p1
+-
+-    if-nez p1, :cond_b
++    invoke-virtual {p0, v2}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setShortcutLaunchInProgress(Z)V
++
++    sget-object p1, Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;->FACE_AUTH_UPDATED_PRIMARY_BOUNCER_SHOWN:Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;
++
++    invoke-virtual {p0, p2, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->updateBiometricListeningState(ILcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;)V
+ 
+     iget-boolean p1, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mPrimaryBouncerFullyShown:Z
+ 
+-    if-nez p1, :cond_b
+-
+-    invoke-virtual {p0, v2}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setUnlockingKeyguard(Z)V
++    if-eqz p1, :cond_b
++
++    const-string p1, "LSE1001"
++
++    const-string p2, "1"
++
++    const-string v0, "101"
++
++    invoke-static {v0, p1, p2}, Lcom/android/systemui/util/SystemUIAnalytics;->sendEventLog(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+ 
+     :cond_b
+-    invoke-virtual {p0, v2}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setShortcutLaunchInProgress(Z)V
+-
+-    sget-object p1, Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;->FACE_AUTH_UPDATED_PRIMARY_BOUNCER_SHOWN:Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;
+-
+-    invoke-virtual {p0, p2, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->updateBiometricListeningState(ILcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;)V
+-
+-    iget-boolean p1, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mPrimaryBouncerFullyShown:Z
+-
+-    if-eqz p1, :cond_c
+-
+-    const-string p1, "LSE1001"
+-
+-    const-string p2, "1"
+-
+-    const-string v0, "101"
+-
+-    invoke-static {v0, p1, p2}, Lcom/android/systemui/util/SystemUIAnalytics;->sendEventLog(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+-
+-    :cond_c
+     iget-object p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mPluginAODManagerLazy:Ldagger/Lazy;
+ 
+     invoke-interface {p0}, Ldagger/Lazy;->get()Ljava/lang/Object;
+@@ -6561,7 +6571,7 @@
+ 
+     iget-boolean v2, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsDynamicLockViewMode:Z
+ 
+-    if-eq v2, v1, :cond_5d
++    if-eq v2, v1, :cond_5a
+ 
+     iput-boolean v1, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsDynamicLockViewMode:Z
+ 
+@@ -6661,7 +6671,7 @@
+ 
+     sget-boolean v1, Landroid/os/Build;->IS_ENG:Z
+ 
+-    if-eqz v1, :cond_5d
++    if-eqz v1, :cond_5a
+ 
+     :cond_3
+     iget-object v0, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mPluginFaceWidgetManagerLazy:Ldagger/Lazy;
+@@ -7138,7 +7148,7 @@
+ 
+     move-result v3
+ 
+-    if-nez v3, :cond_13
++    if-nez v3, :cond_12
+ 
+     const-string v3, "face"
+ 
+@@ -7146,7 +7156,7 @@
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_12
++    if-nez v1, :cond_11
+ 
+     iget-object v1, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mViewMediatorCallbackLazy:Ldagger/Lazy;
+ 
+@@ -7377,7 +7387,7 @@
+     :try_end_0
+     .catch Landroid/os/RemoteException; {:try_start_0 .. :try_end_0} :catch_0
+ 
+-    goto/16 :goto_15
++    goto/16 :goto_14
+ 
+     :catch_0
+     move-exception v0
+@@ -7522,7 +7532,7 @@
+     :try_end_2
+     .catch Landroid/os/RemoteException; {:try_start_2 .. :try_end_2} :catch_2
+ 
+-    goto/16 :goto_15
++    goto/16 :goto_14
+ 
+     :catch_2
+     move-exception v0
+@@ -8466,7 +8476,7 @@
+ 
+     iget-boolean v2, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsQsFullyExpanded:Z
+ 
+-    if-eq v2, v1, :cond_5d
++    if-eq v2, v1, :cond_5a
+ 
+     const-string v2, "KeyguardUpdateMonitor"
+ 
+@@ -9133,7 +9143,7 @@
+ 
+     iput-object v4, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mLockSettingsService:Lcom/android/internal/widget/ILockSettings;
+ 
+-    :cond_57
++    :cond_55
+     iget-object v4, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mLockSettingsService:Lcom/android/internal/widget/ILockSettings;
+ 
+     iget-object v0, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mSecureLockChangedCallback:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$2;
+@@ -9154,7 +9164,7 @@
+     :try_end_4
+     .catch Landroid/os/RemoteException; {:try_start_4 .. :try_end_4} :catch_3
+ 
+-    goto/16 :goto_15
++    goto/16 :goto_14
+ 
+     :catch_3
+     move-exception v0
+@@ -9229,8 +9239,8 @@
+ 
+     return-void
+ 
+-    :cond_5a
+-    :goto_14
++    :cond_58
++    :goto_13
+     sget-object v1, Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;->FACE_AUTH_UPDATED_COVER_STATE_CHANGED:Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;
+ 
+     const/4 v4, 0x2
+@@ -9239,7 +9249,7 @@
+ 
+     return-void
+ 
+-    :cond_5b
++    :cond_59
+     iget-object v1, v1, Landroid/os/Message;->obj:Ljava/lang/Object;
+ 
+     check-cast v1, Ljava/lang/Boolean;
+@@ -9250,7 +9260,7 @@
+ 
+     iget-boolean v2, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsNotiStarShown:Z
+ 
+-    if-eq v2, v1, :cond_5d
++    if-eq v2, v1, :cond_5a
+ 
+     const-string v2, "KeyguardUpdateMonitor"
+ 
+@@ -9526,74 +9536,135 @@
+ .end method
+ 
+ .method public final handleStartedGoingToSleep(I)V
+-    .locals 2
+-
++    .locals 4
++
++    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_SIDE:Z
++
++    if-eqz v0, :cond_0
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isEnabledWof()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_0
++
++    invoke-static {}, Lcom/android/systemui/util/DeviceType;->isSideFingerprintExclusiveSupported()Z
++
++    move-result v0
++
++    if-nez v0, :cond_0
++
++    const/4 v0, 0x2
++
++    if-ne p1, v0, :cond_0
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mHandler:Lcom/android/keyguard/KeyguardUpdateMonitor$16;
++
++    iget-object v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mTimeoutSkipFPResponse:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$1;
++
++    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacks(Ljava/lang/Runnable;)V
++
++    const/4 v0, 0x1
++
++    iput-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mHandler:Lcom/android/keyguard/KeyguardUpdateMonitor$16;
++
++    iget-object v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mTimeoutSkipFPResponse:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$1;
++
++    const-wide/16 v2, 0x2bc
++
++    invoke-virtual {v0, v1, v2, v3}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
++
++    const-string v0, "KeyguardFingerprint"
++
++    const-string v1, "ScreenOff by the powerKey. If it receives a response within 700ms, it will skip."
++
++    invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
++
++    :cond_0
+     sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_BACKGROUND_AUTHENTICATION:Z
+ 
+     const/4 v1, 0x0
+ 
++    if-eqz v0, :cond_1
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsFPCanceledByForegroundApp:Z
++
++    :cond_1
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsShortcutLaunchInProgress:Z
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsFaceWidgetFullScreenMode:Z
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsStartFacePossible:Z
++
++    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_SUB_DISPLAY_COVER:Z
++
++    if-eqz v0, :cond_2
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mForceStartFinger:Z
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubBioAuth:Z
++
++    :cond_2
++    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setFaceAuthenticated(Z)V
++
++    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setFingerprintAuthenticated(Z)V
++
++    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_ESIM:Z
++
++    if-eqz v0, :cond_3
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->clearESimRemoved()V
++
++    :cond_3
++    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setUnlockingKeyguard(Z)V
++
++    invoke-super {p0, p1}, Lcom/android/keyguard/KeyguardUpdateMonitor;->handleStartedGoingToSleep(I)V
++
++    return-void
++.end method
++
++.method public final handleStartedWakingUp(I)V
++    .locals 3
++
++    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_SIDE:Z
++
++    const/4 v1, 0x0
++
+     if-eqz v0, :cond_0
+ 
+-    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsFPCanceledByForegroundApp:Z
++    iget-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    if-eqz v0, :cond_0
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mHandler:Lcom/android/keyguard/KeyguardUpdateMonitor$16;
++
++    iget-object v2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mTimeoutSkipFPResponse:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$1;
++
++    invoke-virtual {v0, v2}, Landroid/os/Handler;->removeCallbacks(Ljava/lang/Runnable;)V
++
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    const-string/jumbo v0, "skip FP response canceled by handleStartedWakingUp : wakeup reason = "
++
++    const-string v2, "KeyguardFingerprint"
++
++    invoke-static {p1, v0, v2}, Lcom/android/keyguard/ConnectedDisplayKeyguardPresentation$$ExternalSyntheticOutline0;->m(ILjava/lang/String;Ljava/lang/String;)V
+ 
+     :cond_0
+-    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsShortcutLaunchInProgress:Z
+-
+-    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsFaceWidgetFullScreenMode:Z
+-
+-    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsStartFacePossible:Z
+-
+     sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_SUB_DISPLAY_COVER:Z
+ 
+     if-eqz v0, :cond_1
+ 
+-    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mForceStartFinger:Z
+-
+-    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubBioAuth:Z
++    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubWofFpAuth:Z
+ 
+     :cond_1
+-    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setFaceAuthenticated(Z)V
+-
+-    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setFingerprintAuthenticated(Z)V
+-
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_ESIM:Z
+-
+-    if-eqz v0, :cond_2
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->clearESimRemoved()V
+-
+-    :cond_2
+-    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setUnlockingKeyguard(Z)V
+-
+-    invoke-super {p0, p1}, Lcom/android/keyguard/KeyguardUpdateMonitor;->handleStartedGoingToSleep(I)V
+-
+-    return-void
+-.end method
+-
+-.method public final handleStartedWakingUp(I)V
+-    .locals 2
+-
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_SUB_DISPLAY_COVER:Z
+-
+-    const/4 v1, 0x0
+-
+-    if-eqz v0, :cond_0
+-
+-    iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mNeedSubWofFpAuth:Z
+-
+-    :cond_0
+     iget v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mPhoneState:I
+ 
+-    if-nez v0, :cond_1
++    if-nez v0, :cond_2
+ 
+     iput-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsFPCanceledByProximity:Z
+-
+-    :cond_1
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz v0, :cond_2
+-
+-    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sendScreenStatus(Z)V
+ 
+     :cond_2
+     invoke-super {p0, p1}, Lcom/android/keyguard/KeyguardUpdateMonitor;->handleStartedWakingUp(I)V
+@@ -11048,76 +11119,38 @@
+     return v2
+ .end method
+ 
+-.method public final isInDisplayFingerprintMarginAccepted()Z
+-    .locals 3
++.method public final isInDisplayFingerprintMarginAccepted()V
++    .locals 2
+ 
+     invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->is2StepVerification()Z
+ 
+     move-result v0
+ 
++    if-nez v0, :cond_0
++
++    iget-object p0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mStrongAuthTracker:Lcom/android/keyguard/KeyguardUpdateMonitor$StrongAuthTracker;
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor$StrongAuthTracker;->this$0:Lcom/android/keyguard/KeyguardUpdateMonitor;
++
++    iget-object v0, v0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mSelectedUserInteractor:Lcom/android/systemui/user/domain/interactor/SelectedUserInteractor;
++
++    invoke-virtual {v0}, Lcom/android/systemui/user/domain/interactor/SelectedUserInteractor;->getSelectedUserId()I
++
++    move-result v0
++
+     const/4 v1, 0x1
+ 
+-    if-nez v0, :cond_0
+-
+-    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mStrongAuthTracker:Lcom/android/keyguard/KeyguardUpdateMonitor$StrongAuthTracker;
+-
+-    iget-object v2, v0, Lcom/android/keyguard/KeyguardUpdateMonitor$StrongAuthTracker;->this$0:Lcom/android/keyguard/KeyguardUpdateMonitor;
+-
+-    iget-object v2, v2, Lcom/android/keyguard/KeyguardUpdateMonitor;->mSelectedUserInteractor:Lcom/android/systemui/user/domain/interactor/SelectedUserInteractor;
+-
+-    invoke-virtual {v2}, Lcom/android/systemui/user/domain/interactor/SelectedUserInteractor;->getSelectedUserId()I
+-
+-    move-result v2
+-
+-    invoke-virtual {v0, v1, v2}, Lcom/android/internal/widget/LockPatternUtils$StrongAuthTracker;->isBiometricAllowedForUser(ZI)Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_1
++    invoke-virtual {p0, v1, v0}, Lcom/android/internal/widget/LockPatternUtils$StrongAuthTracker;->isBiometricAllowedForUser(ZI)Z
++
++    move-result p0
++
++    if-eqz p0, :cond_1
+ 
+     :cond_0
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz v0, :cond_1
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isFingerprintOptionEnabled()Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_1
+-
+-    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mCurrentSecurityMode:Lcom/android/keyguard/KeyguardSecurityModel$SecurityMode;
+-
+-    sget-object v2, Lcom/android/keyguard/KeyguardSecurityModel$SecurityMode;->Swipe:Lcom/android/keyguard/KeyguardSecurityModel$SecurityMode;
+-
+-    if-eq v0, v2, :cond_1
+-
+-    invoke-static {v0}, Lcom/android/keyguard/SecurityUtils;->checkFullscreenBouncer(Lcom/android/keyguard/KeyguardSecurityModel$SecurityMode;)Z
+-
+-    move-result v0
+-
+-    if-nez v0, :cond_1
+-
+-    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mContext:Landroid/content/Context;
+-
+-    invoke-static {v0}, Lcom/android/systemui/util/DeviceState;->isSmartViewDisplayWithFitToAspectRatio(Landroid/content/Context;)Z
+-
+-    move-result v0
+-
+-    if-nez v0, :cond_1
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isForgotPasswordView()Z
+-
+-    move-result p0
+-
+-    if-nez p0, :cond_1
+-
+-    return v1
++    sget-object p0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+ 
+     :cond_1
+-    const/4 p0, 0x0
+-
+-    return p0
++    return-void
+ .end method
+ 
+ .method public final isKeyguardUnlocking()Z
+@@ -12139,52 +12172,8 @@
+     invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setFaceAuthenticated(Z)V
+ 
+     :cond_1
+-    sget-boolean p1, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz p1, :cond_3
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isFingerprintOptionEnabled()Z
+-
+-    move-result p1
+-
+-    if-eqz p1, :cond_3
+-
+-    iget-object p1, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mUserFingerprintAuthenticated:Landroid/util/SparseArray;
+-
+-    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mUserTracker:Lcom/android/systemui/settings/UserTracker;
+-
+-    check-cast v0, Lcom/android/systemui/settings/UserTrackerImpl;
+-
+-    invoke-virtual {v0}, Lcom/android/systemui/settings/UserTrackerImpl;->getUserId()I
+-
+-    move-result v0
+-
+-    invoke-virtual {p1, v0}, Landroid/util/SparseArray;->get(I)Ljava/lang/Object;
+-
+-    move-result-object p1
+-
+-    check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitor$BiometricAuthenticated;
+-
+-    const/4 v0, 0x1
+-
+-    if-eqz p1, :cond_2
+-
+-    iget-boolean p1, p1, Lcom/android/keyguard/KeyguardUpdateMonitor$BiometricAuthenticated;->mIsStrongBiometric:Z
+-
+-    if-eqz p1, :cond_2
+-
+-    move v1, v0
+-
+-    :cond_2
+-    invoke-virtual {p0, v1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isUnlockingWithBiometricAllowed(Z)Z
+-
+-    move-result p1
+-
+-    xor-int/2addr p1, v0
+-
+-    invoke-virtual {p0, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->setFodStrictMode(Z)V
+-
+-    :cond_3
++    sget-object p0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
++
+     return-void
+ .end method
+ 
+@@ -12777,7 +12766,7 @@
+ 
+     new-instance v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda15;
+ 
+-    const/4 v2, 0x7
++    const/4 v2, 0x6
+ 
+     invoke-direct {v1, v2}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda15;-><init>(I)V
+ 
+@@ -12864,16 +12853,6 @@
+     return-void
+ .end method
+ 
+-.method public final semSetScreenStatus()V
+-    .locals 1
+-
+-    const/4 v0, 0x1
+-
+-    invoke-virtual {p0, v0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sendScreenStatus(Z)V
+-
+-    return-void
+-.end method
+-
+ .method public final sendBiometricUnlockState(Landroid/hardware/biometrics/BiometricSourceType;)V
+     .locals 4
+ 
+@@ -13031,77 +13010,6 @@
+     return-void
+ .end method
+ 
+-.method public final sendScreenStatus(Z)V
+-    .locals 4
+-
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz v0, :cond_3
+-
+-    iget-boolean v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mDeviceInteractive:Z
+-
+-    const/4 v1, 0x1
+-
+-    if-nez v0, :cond_0
+-
+-    iget-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsEarlyWakeUp:Z
+-
+-    if-eqz v0, :cond_1
+-
+-    :cond_0
+-    iget-boolean v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mGoingToSleep:Z
+-
+-    if-nez v0, :cond_1
+-
+-    iget-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsDreamingForBiometrics:Z
+-
+-    if-nez v0, :cond_1
+-
+-    move v0, v1
+-
+-    goto :goto_0
+-
+-    :cond_1
+-    const/4 v0, 0x0
+-
+-    :goto_0
+-    xor-int/2addr v0, v1
+-
+-    iget v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpInDisplayState:I
+-
+-    if-ne v1, v0, :cond_2
+-
+-    if-eqz p1, :cond_3
+-
+-    :cond_2
+-    iget-object p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpm:Landroid/hardware/fingerprint/FingerprintManager;
+-
+-    if-eqz p1, :cond_3
+-
+-    new-instance p1, Ljava/lang/StringBuilder;
+-
+-    const-string v1, "mFpInDisplayState is changed : "
+-
+-    invoke-direct {p1, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+-
+-    iget v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpInDisplayState:I
+-
+-    const-string v2, " -> "
+-
+-    const-string v3, "KeyguardFingerprint"
+-
+-    invoke-static {p1, v1, v2, v0, v3}, Lcom/android/keyguard/KeyguardSecPinBasedInputViewController$$ExternalSyntheticOutline0;->m(Ljava/lang/StringBuilder;ILjava/lang/String;ILjava/lang/String;)V
+-
+-    iput v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpInDisplayState:I
+-
+-    iget-object p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFpm:Landroid/hardware/fingerprint/FingerprintManager;
+-
+-    invoke-virtual {p0, v0}, Landroid/hardware/fingerprint/FingerprintManager;->semSetScreenStatus(I)I
+-
+-    :cond_3
+-    return-void
+-.end method
+-
+ .method public final setAlternateBouncerShowing(Z)V
+     .locals 0
+ 
+@@ -13314,7 +13222,7 @@
+ 
+     new-instance v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda15;
+ 
+-    const/4 v2, 0x4
++    const/4 v2, 0x3
+ 
+     invoke-direct {v1, v2}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda15;-><init>(I)V
+ 
+@@ -13480,7 +13388,7 @@
+     :cond_2
+     iget-boolean p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mHasFocus:Z
+ 
+-    if-eqz p2, :cond_7
++    if-eqz p2, :cond_6
+ 
+     iget p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFocusWindow:I
+ 
+@@ -13518,7 +13426,7 @@
+ 
+     iget-boolean p1, p1, Lcom/android/systemui/keyguard/DisplayLifecycle;->mIsFolderOpened:Z
+ 
+-    if-eqz p1, :cond_7
++    if-eqz p1, :cond_6
+ 
+     :cond_4
+     invoke-virtual {p0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->isKeyguardVisible()Z
+@@ -13529,14 +13437,10 @@
+ 
+     iget-boolean p1, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mPrimaryBouncerFullyShown:Z
+ 
+-    if-eqz p1, :cond_7
++    if-eqz p1, :cond_6
+ 
+     :cond_5
+-    sget-boolean p1, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz p1, :cond_6
+-
+-    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isFingerprintOptionEnabled()Z
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isFaceOptionEnabled()Z
+ 
+     move-result p1
+ 
+@@ -14171,13 +14075,30 @@
+ 
+     iput-boolean p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsShortcutLaunchInProgress:Z
+ 
+-    sget-boolean p1, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-eqz p1, :cond_0
+-
+-    const/4 p1, 0x2
+-
+-    invoke-virtual {p0, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->updateFingerprintListeningState(I)V
++    sget-object p0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
++
++    :cond_0
++    return-void
++.end method
++
++.method public final setShowingKeepScreenOnPopup(Z)V
++    .locals 3
++
++    invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->isFingerprintOptionEnabled()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_0
++
++    iget-object v0, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mHandler:Lcom/android/keyguard/KeyguardUpdateMonitor$16;
++
++    new-instance v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27;
++
++    const/4 v2, 0x1
++
++    invoke-direct {v1, p0, p1, v2}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27;-><init>(Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;ZI)V
++
++    invoke-virtual {v0, v1}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
+ 
+     :cond_0
+     return-void
+@@ -14438,11 +14359,11 @@
+ 
+     move-result-object v2
+ 
+-    if-nez v2, :cond_3
++    if-nez v2, :cond_2
+ 
+     goto :goto_0
+ 
+-    :cond_3
++    :cond_2
+     new-instance v1, Landroid/content/ComponentName;
+ 
+     iget-object v2, v2, Landroid/content/pm/ResolveInfo;->activityInfo:Landroid/content/pm/ActivityInfo;
+@@ -15097,7 +15018,7 @@
+ .end method
+ 
+ .method public final shouldListenForFingerprint(Z)Z
+-    .locals 13
++    .locals 11
+ 
+     iget-object p1, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mUserTracker:Lcom/android/systemui/settings/UserTracker;
+ 
+@@ -15119,7 +15040,7 @@
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_2a
++    if-eqz v2, :cond_19
+ 
+     iget-boolean v2, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mDeviceInteractive:Z
+ 
+@@ -15372,9 +15293,9 @@
+     :cond_6
+     invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->getLockoutAttemptDeadline()J
+ 
+-    move-result-wide v9
+-
+-    cmp-long v0, v9, v11
++    move-result-wide v5
++
++    cmp-long v0, v5, v9
+ 
+     if-lez v0, :cond_7
+ 
+@@ -16101,7 +16022,7 @@
+ .end method
+ 
+ .method public final startListeningForFingerprint(Z)V
+-    .locals 18
++    .locals 19
+ 
+     move-object/from16 v0, p0
+ 
+@@ -16173,7 +16094,7 @@
+ 
+     invoke-virtual {v1}, Landroid/os/CancellationSignal;->cancel()V
+ 
+-    iput-object v4, v0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mFingerprintCancelSignal:Landroid/os/CancellationSignal;
++    iput-object v3, v0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mFingerprintCancelSignal:Landroid/os/CancellationSignal;
+ 
+     :cond_0
+     iget-object v1, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mContext:Landroid/content/Context;
+@@ -16182,13 +16103,13 @@
+ 
+     move-result-object v1
+ 
+-    const-string v3, "android.hardware.fingerprint"
+-
+-    invoke-virtual {v1, v3}, Landroid/content/pm/PackageManager;->hasSystemFeature(Ljava/lang/String;)Z
++    const-string v2, "android.hardware.fingerprint"
++
++    invoke-virtual {v1, v2}, Landroid/content/pm/PackageManager;->hasSystemFeature(Ljava/lang/String;)Z
+ 
+     move-result v1
+ 
+-    if-eqz v1, :cond_3
++    if-eqz v1, :cond_4
+ 
+     new-instance v1, Landroid/os/CancellationSignal;
+ 
+@@ -16224,9 +16145,9 @@
+ 
+     if-eqz v1, :cond_1
+ 
+-    iget-object v13, v0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mFingerprintCancelSignal:Landroid/os/CancellationSignal;
+-
+-    new-instance v14, Lcom/android/keyguard/SecFpAuthCallback;
++    iget-object v14, v0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mFingerprintCancelSignal:Landroid/os/CancellationSignal;
++
++    new-instance v15, Lcom/android/keyguard/SecFpAuthCallback;
+ 
+     iget v1, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mFingerprintAuthenticationSequence:I
+ 
+@@ -16240,29 +16161,31 @@
+ 
+     invoke-static {}, Ljava/lang/invoke/VarHandle;->storeStoreFence()V
+ 
+-    invoke-direct {v14, v1, v3, v4}, Lcom/android/keyguard/SecFpAuthCallback;-><init>(ILjava/util/function/Consumer;Ljava/lang/Runnable;)V
+-
+-    iget-object v15, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mAuthHandler:Landroid/os/Handler;
+-
+-    new-instance v1, Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;
+-
+-    invoke-direct {v1}, Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;-><init>()V
+-
+-    invoke-virtual {v1, v8}, Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;->setUserId(I)Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;
+-
+-    move-result-object v1
+-
+-    invoke-virtual {v1}, Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;->build()Landroid/hardware/fingerprint/FingerprintAuthenticateOptions;
+-
+-    move-result-object v16
+-
+-    const/16 v17, 0x1
+-
+-    const/4 v12, 0x0
+-
+-    move-object v11, v2
+-
+-    invoke-virtual/range {v11 .. v17}, Landroid/hardware/fingerprint/FingerprintManager;->authenticate(Landroid/hardware/fingerprint/FingerprintManager$CryptoObject;Landroid/os/CancellationSignal;Landroid/hardware/fingerprint/FingerprintManager$AuthenticationCallback;Landroid/os/Handler;Landroid/hardware/fingerprint/FingerprintAuthenticateOptions;Z)V
++    invoke-direct {v15, v1, v3, v4}, Lcom/android/keyguard/SecFpAuthCallback;-><init>(ILjava/util/function/Consumer;Ljava/lang/Runnable;)V
++
++    iget-object v1, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mAuthHandler:Landroid/os/Handler;
++
++    new-instance v3, Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;
++
++    invoke-direct {v3}, Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;-><init>()V
++
++    invoke-virtual {v3, v8}, Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;->setUserId(I)Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;
++
++    move-result-object v3
++
++    invoke-virtual {v3}, Landroid/hardware/fingerprint/FingerprintAuthenticateOptions$Builder;->build()Landroid/hardware/fingerprint/FingerprintAuthenticateOptions;
++
++    move-result-object v17
++
++    const/16 v18, 0x1
++
++    const/4 v13, 0x0
++
++    move-object/from16 v16, v1
++
++    move-object v12, v2
++
++    invoke-virtual/range {v12 .. v18}, Landroid/hardware/fingerprint/FingerprintManager;->authenticate(Landroid/hardware/fingerprint/FingerprintManager$CryptoObject;Landroid/os/CancellationSignal;Landroid/hardware/fingerprint/FingerprintManager$AuthenticationCallback;Landroid/os/Handler;Landroid/hardware/fingerprint/FingerprintAuthenticateOptions;Z)V
+ 
+     goto :goto_0
+ 
+@@ -16317,21 +16240,44 @@
+     invoke-virtual/range {v2 .. v9}, Landroid/hardware/fingerprint/FingerprintManager;->authenticate(Landroid/hardware/fingerprint/FingerprintManager$CryptoObject;Landroid/os/CancellationSignal;Landroid/hardware/fingerprint/FingerprintManager$AuthenticationCallback;Landroid/os/Handler;III)V
+ 
+     :goto_0
+-    invoke-virtual {v0, v10}, Lcom/android/keyguard/KeyguardUpdateMonitor;->setFingerprintRunningState(I)V
+-
++    invoke-virtual {v0, v11}, Lcom/android/keyguard/KeyguardUpdateMonitor;->setFingerprintRunningState(I)V
++
++    iget-boolean v1, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    if-eqz v1, :cond_3
++
++    iget-object v1, v0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mHandler:Lcom/android/keyguard/KeyguardUpdateMonitor$16;
++
++    iget-object v2, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mTimeoutSkipFPResponse:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$1;
++
++    invoke-virtual {v1, v2}, Landroid/os/Handler;->removeCallbacks(Ljava/lang/Runnable;)V
++
++    iget-object v1, v0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mHandler:Lcom/android/keyguard/KeyguardUpdateMonitor$16;
++
++    iget-object v0, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mTimeoutSkipFPResponse:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$1;
++
++    const-wide/16 v2, 0x2bc
++
++    invoke-virtual {v1, v0, v2, v3}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
++
++    const-string v0, "FP started by the power key. If it receives a response within 700ms, it will skip."
++
++    invoke-static {v10, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
++
++    :cond_3
+     return-void
+ 
+-    :cond_3
++    :cond_4
+     const-string/jumbo v0, "startListeningForFingerprint() return - fingerprint service is not supported"
+ 
+-    invoke-static {v2, v0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
++    invoke-static {v10, v0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
+ 
+     return-void
+ 
+-    :cond_4
++    :cond_5
+     const-string v0, "Can\'t start startListeningForFingerprint()"
+ 
+-    invoke-static {v2, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
++    invoke-static {v10, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+ 
+     return-void
+ .end method
+@@ -16424,7 +16370,7 @@
+ .end method
+ 
+ .method public final stopListeningForFingerprint()V
+-    .locals 2
++    .locals 3
+ 
+     const-string v0, "KeyguardUpdateMonitor"
+ 
+@@ -16447,8 +16393,29 @@
+ 
+     invoke-virtual {p0, v0}, Lcom/android/keyguard/KeyguardUpdateMonitor;->setFingerprintRunningState(I)V
+ 
+-    sget-object p0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+-
++    sget-boolean v1, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_SIDE:Z
++
++    if-eqz v1, :cond_1
++
++    iget-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    if-eqz v1, :cond_1
++
++    iget-object v1, p0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mHandler:Lcom/android/keyguard/KeyguardUpdateMonitor$16;
++
++    iget-object v2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mTimeoutSkipFPResponse:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$1;
++
++    invoke-virtual {v1, v2}, Landroid/os/Handler;->removeCallbacks(Ljava/lang/Runnable;)V
++
++    iput-boolean v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mIsSkipFPResponse:Z
++
++    const-string p0, "KeyguardFingerprint"
++
++    const-string/jumbo v0, "skip FP response canceled by stopListeningForFingerprint"
++
++    invoke-static {p0, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
++
++    :cond_1
+     return-void
+ .end method
+ 
+@@ -17828,7 +17795,7 @@
+ 
+     invoke-virtual {p0}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->stopListeningForFingerprint()V
+ 
+-    goto :goto_3
++    goto :goto_2
+ 
+     :cond_5
+     if-nez v2, :cond_7
+diff --git a/smali/com/android/keyguard/SecLockIconViewController$7.smali b/smali/com/android/keyguard/SecLockIconViewController$7.smali
+--- a/smali/com/android/keyguard/SecLockIconViewController$7.smali
++++ b/smali/com/android/keyguard/SecLockIconViewController$7.smali
+@@ -80,9 +80,7 @@
+ .method public final onLockModeChanged()V
+     .locals 1
+ 
+-    sget-boolean v0, Lcom/android/systemui/LsRune;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-nez v0, :cond_0
++    sget-object v0, Lcom/android/systemui/LsRune;->VALUE_SUB_DISPLAY_POLICY:Ljava/lang/String;
+ 
+     iget-object p0, p0, Lcom/android/keyguard/SecLockIconViewController$7;->this$0:Lcom/android/keyguard/SecLockIconViewController;
+ 
+diff --git a/smali/com/android/keyguard/KeyguardUpdateMonitor.smali b/smali/com/android/keyguard/KeyguardUpdateMonitor.smali
+--- a/smali/com/android/keyguard/KeyguardUpdateMonitor.smali
++++ b/smali/com/android/keyguard/KeyguardUpdateMonitor.smali
+@@ -9179,9 +9179,6 @@
+     return-void
+ .end method
+ 
+-.method public abstract semSetScreenStatus()V
+-.end method
+-
+ .method public sendBiometricUnlockState(Landroid/hardware/biometrics/BiometricSourceType;)V
+     .locals 0
+ 
+diff --git a/smali/com/android/keyguard/SecurityUtils.smali b/smali/com/android/keyguard/SecurityUtils.smali
+--- a/smali/com/android/keyguard/SecurityUtils.smali
++++ b/smali/com/android/keyguard/SecurityUtils.smali
+@@ -61,7 +61,7 @@
+ .end method
+ 
+ .method public static calculateLandscapeViewWidth(ILandroid/content/Context;)I
+-    .locals 3
++    .locals 1
+ 
+     invoke-virtual {p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+ 
+@@ -408,18 +408,18 @@
+ 
+     const/4 v3, 0x1
+ 
+-    if-eq v1, v3, :cond_2
++    if-eq v1, v3, :cond_1
+ 
+     const/4 v4, 0x3
+ 
+-    if-ne v1, v4, :cond_1
++    if-ne v1, v4, :cond_0
+ 
+     goto :goto_0
+ 
++    :cond_0
++    const/4 v3, 0x0
++
+     :cond_1
+-    const/4 v3, 0x0
+-
+-    :cond_2
+     :goto_0
+     sget-boolean v1, Lcom/android/systemui/LsRune;->SECURITY_SUB_DISPLAY_LOCK:Z
+ 
+@@ -427,9 +427,9 @@
+ 
+     const v5, 0x7e07066c
+ 
+-    if-eqz v1, :cond_5
+-
+-    if-eqz v3, :cond_4
++    if-eqz v1, :cond_4
++
++    if-eqz v3, :cond_3
+ 
+     invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+ 
+@@ -441,7 +441,7 @@
+ 
+     iget v1, v1, Landroid/content/res/Configuration;->semDisplayDeviceType:I
+ 
+-    if-nez v1, :cond_3
++    if-nez v1, :cond_2
+ 
+     invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+ 
+@@ -453,18 +453,46 @@
+ 
+     goto :goto_1
+ 
++    :cond_2
++    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
++
++    move-result-object p0
++
++    invoke-virtual {p0, v4}, Landroid/content/res/Resources;->getFloat(I)F
++
++    move-result v2
++
++    goto :goto_1
++
+     :cond_3
+     invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+ 
+     move-result-object p0
+ 
++    invoke-virtual {p0, v5}, Landroid/content/res/Resources;->getFloat(I)F
++
++    move-result v2
++
++    goto :goto_1
++
++    :cond_4
++    sget-boolean v1, Lcom/android/systemui/LsRune;->SECURITY_SUB_DISPLAY_COVER:Z
++
++    if-eqz v1, :cond_6
++
++    if-eqz v3, :cond_5
++
++    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
++
++    move-result-object p0
++
+     invoke-virtual {p0, v4}, Landroid/content/res/Resources;->getFloat(I)F
+ 
+     move-result v2
+ 
+     goto :goto_1
+ 
+-    :cond_4
++    :cond_5
+     invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+ 
+     move-result-object p0
+@@ -475,80 +503,52 @@
+ 
+     goto :goto_1
+ 
+-    :cond_5
+-    sget-boolean v1, Lcom/android/systemui/LsRune;->SECURITY_SUB_DISPLAY_COVER:Z
+-
+-    if-eqz v1, :cond_7
+-
+-    if-eqz v3, :cond_6
+-
+-    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+-
+-    move-result-object p0
+-
+-    invoke-virtual {p0, v4}, Landroid/content/res/Resources;->getFloat(I)F
++    :cond_6
++    invoke-static {}, Lcom/android/systemui/util/DeviceState;->isTablet()Z
++
++    move-result v1
++
++    if-eqz v1, :cond_8
++
++    if-eqz v3, :cond_7
++
++    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
++
++    move-result-object p0
++
++    invoke-virtual {p0, v5}, Landroid/content/res/Resources;->getFloat(I)F
+ 
+     move-result v2
+ 
+     goto :goto_1
+ 
+-    :cond_6
+-    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+-
+-    move-result-object p0
+-
+-    invoke-virtual {p0, v5}, Landroid/content/res/Resources;->getFloat(I)F
++    :cond_7
++    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
++
++    move-result-object p0
++
++    const v1, 0x7e070671
++
++    invoke-virtual {p0, v1}, Landroid/content/res/Resources;->getFloat(I)F
+ 
+     move-result v2
+ 
+     goto :goto_1
+ 
+-    :cond_7
+-    invoke-static {}, Lcom/android/systemui/util/DeviceState;->isTablet()Z
+-
+-    move-result v1
+-
+-    if-eqz v1, :cond_9
+-
+-    if-eqz v3, :cond_8
+-
+-    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+-
+-    move-result-object p0
+-
+-    invoke-virtual {p0, v5}, Landroid/content/res/Resources;->getFloat(I)F
+-
+-    move-result v2
+-
+-    goto :goto_1
+-
+     :cond_8
+-    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+-
+-    move-result-object p0
+-
+-    const v1, 0x7e070671
++    if-eqz v3, :cond_9
++
++    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
++
++    move-result-object p0
++
++    const v1, 0x7e07066e
+ 
+     invoke-virtual {p0, v1}, Landroid/content/res/Resources;->getFloat(I)F
+ 
+     move-result v2
+ 
+-    goto :goto_1
+-
+     :cond_9
+-    if-eqz v3, :cond_a
+-
+-    invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+-
+-    move-result-object p0
+-
+-    const v1, 0x7e07066e
+-
+-    invoke-virtual {p0, v1}, Landroid/content/res/Resources;->getFloat(I)F
+-
+-    move-result v2
+-
+-    :cond_a
+     :goto_1
+     mul-float/2addr v0, v2
+ 
+-- 
+2.43.0

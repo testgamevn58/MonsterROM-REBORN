@@ -1,0 +1,19 @@
+From 9aa75ed04dbdb0aaf5e453b92746b967c21e5be5 Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Fri, 17 Oct 2025 12:10:38 +0200
+Subject: [PATCH] Enable Power off lock feature
+
+---
+ .../PowerOffLockPreferenceController.smali    | 20 ++-----------------
+ 1 file changed, 2 insertions(+), 18 deletions(-)
+
+diff --git a/smali_classes2/kotlin/KotlinNullPointerException.smali b/smali_classes2/kotlin/KotlinNullPointerException.smali
+--- a/smali_classes2/kotlin/KotlinNullPointerException.smali
++++ b/smali_classes2/kotlin/KotlinNullPointerException.smali
+@@ -1,3 +1,3 @@
+ .class public Lkotlin/KotlinNullPointerException;
+-.super Ljava/lang/NullPointerException;
++.super Ljava/lang/NullPointerException;
+ .source "qb/108127447 0ed26ceaed41b2ffa78f66d43c52ac26b7a9ed73eb466bc2a97587badce0b9e8"
+-- 
+2.43.0

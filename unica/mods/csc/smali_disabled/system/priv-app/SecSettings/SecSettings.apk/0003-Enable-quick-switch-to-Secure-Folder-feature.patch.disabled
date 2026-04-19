@@ -1,0 +1,37 @@
+From cd9f56675bd1c394c1a07bf1c760ccef485d10cb Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Mon, 17 Nov 2025 00:46:42 +0100
+Subject: [PATCH] Enable quick switch to Secure Folder feature
+
+---
+ .../android/settings/usefulfeature/Usefulfeature$1.smali | 9 ---------
+ .../usefulfeature/functionkey/FunctionKeyUtils.smali     | 4 +---
+ 2 files changed, 1 insertion(+), 12 deletions(-)
+
+diff --git a/smali_classes2/com/samsung/android/settings/usefulfeature/Usefulfeature$1.smali b/smali_classes2/com/samsung/android/settings/usefulfeature/Usefulfeature$1.smali
+--- a/smali_classes2/com/samsung/android/settings/usefulfeature/Usefulfeature$1.smali
++++ b/smali_classes2/com/samsung/android/settings/usefulfeature/Usefulfeature$1.smali
+@@ -280,7 +280,6 @@
+ 
+     iput-object p1, v0, Lcom/android/settingslib/search/SearchIndexableRaw;->keywords:Ljava/lang/String;
+ 
+-    :cond_1
+     const-string p1, "function_key_setting"
+ 
+     iput-object p1, v0, Landroid/provider/SearchIndexableData;->key:Ljava/lang/String;
+diff --git a/smali_classes2/com/samsung/android/settings/usefulfeature/functionkey/FunctionKeyUtils.smali b/smali_classes2/com/samsung/android/settings/usefulfeature/functionkey/FunctionKeyUtils.smali
+--- a/smali_classes2/com/samsung/android/settings/usefulfeature/functionkey/FunctionKeyUtils.smali
++++ b/smali_classes2/com/samsung/android/settings/usefulfeature/functionkey/FunctionKeyUtils.smali
+@@ -723,9 +723,7 @@
+ 
+     sget v30, Lcom/samsung/android/settings/usefulfeature/functionkey/item/SecureFolderAction;->pressType:I
+ 
+-    invoke-static {v1, v0}, Lcom/android/settings/Utils;->hasPackage(Landroid/content/Context;Ljava/lang/String;)Z
+-
+-    move-result v0
++    const/4 v0, 0x1
+ 
+     if-nez v0, :cond_9
+ 
+-- 
+2.43.0

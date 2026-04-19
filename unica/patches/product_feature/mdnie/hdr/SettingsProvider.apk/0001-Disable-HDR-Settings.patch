@@ -7,29 +7,13 @@ Subject: [PATCH] Disable HDR Settings
  .../providers/settings/SecUpgradeController.smali    | 12 ------------
  1 file changed, 12 deletions(-)
 
-diff --git a/smali/com/android/providers/settings/SecUpgradeController.smali b/smali/com/android/providers/settings/SecUpgradeController.smali
-index 0265528..afefaea 100644
---- a/smali/com/android/providers/settings/SecUpgradeController.smali
-+++ b/smali/com/android/providers/settings/SecUpgradeController.smali
-@@ -1153,18 +1153,6 @@
-     invoke-virtual/range {v2 .. v7}, Lcom/android/providers/settings/SettingsState;->insertSettingLocked(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;)Z
- 
-     :goto_9
--    const/4 v6, 0x1
--
--    const-string v7, "android"
--
--    const-string v3, "hdr_effect"
--
--    const-string v4, "0"
--
--    const/4 v5, 0x0
--
--    invoke-virtual/range {v2 .. v7}, Lcom/android/providers/settings/SettingsState;->insertSettingLocked(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;)Z
--
-     invoke-static {}, Landroid/os/FactoryTest;->isFactoryBinary()Z
- 
-     move-result v1
+diff --git a/smali/android/aconfigd/AconfigdFlagInfo$Builder.smali b/smali/android/aconfigd/AconfigdFlagInfo$Builder.smali
+--- a/smali/android/aconfigd/AconfigdFlagInfo$Builder.smali
++++ b/smali/android/aconfigd/AconfigdFlagInfo$Builder.smali
+@@ -1,3 +1,3 @@
+ .class public Landroid/aconfigd/AconfigdFlagInfo$Builder;
+-.super Ljava/lang/Object;
++.super Ljava/lang/Object;
+ .source "AconfigdFlagInfo.java"
 -- 
-2.51.0
-
+2.43.0

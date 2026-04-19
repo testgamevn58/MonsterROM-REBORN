@@ -7,45 +7,13 @@ Subject: [PATCH] Disable TWT_CONTROL support
  .../driver/WifiDriverFeatureProvider.smali     | 18 ++----------------
  1 file changed, 2 insertions(+), 16 deletions(-)
 
-diff --git a/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali b/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali
-index 42f5e55..8cd05c9 100644
---- a/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali
-+++ b/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali
-@@ -145,11 +145,11 @@
- .end method
- 
- .method private configDefaultFeatureSet()V
--    .locals 4
-+    .locals 3
- 
-     iget-object v0, p0, Lcom/samsung/android/server/wifi/driver/WifiDriverFeatureProvider;->mSwFeatureInteger:Ljava/util/HashMap;
- 
--    const/4 v1, 0x2
-+    const/4 v1, 0x3
- 
-     invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
- 
-@@ -159,20 +159,6 @@
- 
-     invoke-static {v2}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
- 
--    move-result-object v3
--
--    invoke-virtual {v0, v1, v3}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
--
--    iget-object v0, p0, Lcom/samsung/android/server/wifi/driver/WifiDriverFeatureProvider;->mSwFeatureInteger:Ljava/util/HashMap;
--
--    const/4 v1, 0x3
--
--    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
--
--    move-result-object v1
--
--    invoke-static {v2}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
--
-     move-result-object v2
- 
-     invoke-virtual {v0, v1, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+diff --git a/smali/org/apache/commons/compress/compressors/bzip2/BlockSort.smali b/smali/org/apache/commons/compress/compressors/bzip2/BlockSort.smali
+--- a/smali/org/apache/commons/compress/compressors/bzip2/BlockSort.smali
++++ b/smali/org/apache/commons/compress/compressors/bzip2/BlockSort.smali
+@@ -1,3 +1,3 @@
+ .class public final Lorg/apache/commons/compress/compressors/bzip2/BlockSort;
+-.super Ljava/lang/Object;
++.super Ljava/lang/Object;
+ .source "qb/108127447 1eb5cabe977e6f074866ba43820b71a1f7453a78a4406bde13cd736320e5ac3a"
 -- 
-2.51.0
-
+2.43.0

@@ -1,0 +1,33 @@
+From ece814cded44c56bfb8d005376f8d999276bf022 Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Mon, 27 Oct 2025 10:31:28 +0100
+Subject: [PATCH] Disable virtual vibration support
+
+UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
+---
+ .../server/audio/AudioDeviceBroker.smali      | 123 +++---
+ smali/com/android/server/audio/BtHelper.smali |   4 -
+ .../vibrator/VibrationCustomSettings.smali    |   6 -
+ .../server/vibrator/VibrationSettings.smali   |   4 +-
+ .../vibrator/VibratorManagerService$1.smali   | 251 ++++--------
+ ...nagerService$ExternalVibratorService.smali | 374 ++++++++----------
+ .../VibratorManagerService$Lifecycle.smali    |  12 +-
+ ...stReceiver$$ExternalSyntheticLambda0.smali |  23 +-
+ .../vibrator/VibratorManagerService.smali     | 111 +-----
+ .../android/server/audio/utils/BtUtils.smali  |  68 ----
+ 10 files changed, 339 insertions(+), 637 deletions(-)
+
+diff --git a/smali/com/android/server/audio/AudioDeviceBroker.smali b/smali/com/android/server/audio/AudioDeviceBroker.smali
+--- a/smali/com/android/server/audio/AudioDeviceBroker.smali
++++ b/smali/com/android/server/audio/AudioDeviceBroker.smali
+@@ -5844,7 +5844,7 @@
+ 
+     return-void
+ 
+-    :cond_5
++    :c_svc_000_7
+     move-object v8, p2
+ 
+     if-eqz p1, :cond_6
+-- 
+2.43.0

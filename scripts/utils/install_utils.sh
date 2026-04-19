@@ -1,7 +1,6 @@
 # Copyright (c) 2026 Salvo Giangreco
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# [
 source "$SRC_DIR/scripts/utils/build_utils.sh" || return 1
 
 KERNEL_BINS="dt dtbo init_boot vendor_boot"
@@ -17,10 +16,7 @@ _GET_PARTITION_SIZE()
 
     echo -n "${!PARTITION_SIZE}"
 }
-# ]
 
-# GET_DEVICE_FROM_MOUNTPOINT <mountpoint>
-# Returns the device path for the supplied mountpoint.
 GET_DEVICE_FROM_MOUNTPOINT()
 {
     _CHECK_NON_EMPTY_PARAM "MOUNTPOINT" "$1" || return 1
@@ -36,7 +32,7 @@ GET_DEVICE_FROM_MOUNTPOINT()
         fi
     fi
     if [ ! -f "$FSTAB_FILE" ]; then
-        LOGE "File not found: target/$TARGET_CODENAME/installer/recovery.fstab"
+        LOGW "File not found: target/$TARGET_CODENAME/installer/recovery.fstab"
         exit 1
     fi
 
@@ -64,8 +60,6 @@ GET_DEVICE_FROM_MOUNTPOINT()
     fi
 }
 
-# PRINT_ASSERTIONS <info>
-# Returns the assertions code text to be used in the updater-script file.
 PRINT_ASSERTIONS()
 {
     _CHECK_NON_EMPTY_PARAM "BUILD_INFO" "$1" || return 1
@@ -106,9 +100,6 @@ PRINT_ASSERTIONS()
     fi
 }
 
-# PRINT_BUILD_INFO <info> [info]
-# Returns the text to be used in the build_info.txt file.
-# Both source and target info can be passed for incremental zips.
 PRINT_BUILD_INFO()
 {
     local SOURCE_BUILD_INFO
@@ -140,8 +131,6 @@ PRINT_BUILD_INFO()
     fi
 }
 
-# PRINT_HEADER <info>
-# Returns the header text to be used in the updater-script file.
 PRINT_HEADER()
 {
     _CHECK_NON_EMPTY_PARAM "BUILD_INFO" "$1" || return 1
@@ -191,39 +180,7 @@ PRINT_HEADER()
     PRINT_SEPARATOR
 }
 
-# PRINT_SEPARATOR
-# Returns the separator text to be used in the updater-script file.
 PRINT_SEPARATOR()
 {
     echo 'ui_print("****************************************");'
-}
-
-# SIGN_IMAGE_WITH_AVB <file>
-# Signs the supplied image with avbtool if not AVB-signed already.
-# The TARGET_${PARTITION_NAME}_PARTITION_SIZE environment variable is required to be set.
-SIGN_IMAGE_WITH_AVB()
-{
-    _CHECK_NON_EMPTY_PARAM "FILE" "$1" || return 1
-
-    local FILE="$1"
-
-    if ! avbtool info_image --image "$FILE" &> /dev/null; then
-        local PARTITION_NAME
-        PARTITION_NAME="$(basename "$FILE")"
-        PARTITION_NAME="${PARTITION_NAME//.img/}"
-
-        _GET_PARTITION_SIZE "$PARTITION_NAME" > /dev/null || return 1
-
-        local CMD
-        CMD+="avbtool add_hash_footer "
-        CMD+="--image \"$FILE\" "
-        CMD+="--partition_size \"$(_GET_PARTITION_SIZE "$PARTITION_NAME")\" "
-        CMD+="--partition_name \"$PARTITION_NAME\" "
-        CMD+="--hash_algorithm \"sha256\" "
-        CMD+="--algorithm \"SHA256_RSA4096\" "
-        CMD+="--key \"$SRC_DIR/security/avb/testkey_rsa4096.pem\""
-
-        LOG "- Signing image with AVB"
-        EVAL "$CMD" || return 1
-    fi
 }

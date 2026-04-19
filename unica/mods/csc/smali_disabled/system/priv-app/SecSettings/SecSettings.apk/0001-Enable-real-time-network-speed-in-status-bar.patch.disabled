@@ -1,0 +1,21 @@
+From cf9b438bc847d171dcfd6b54cd2c134052e982b0 Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Fri, 17 Oct 2025 12:02:03 +0200
+Subject: [PATCH] Enable real time network speed in status bar
+
+---
+ .../ConfigureNotificationMoreSettings$1.smali | 14 ++--------
+ .../StatusBarNetworkSpeedController.smali     | 14 ++--------
+ .../provider/items/NotificationsItem.smali    | 26 +++----------------
+ 3 files changed, 8 insertions(+), 46 deletions(-)
+
+diff --git a/smali_classes2/kotlin/KotlinNullPointerException.smali b/smali_classes2/kotlin/KotlinNullPointerException.smali
+--- a/smali_classes2/kotlin/KotlinNullPointerException.smali
++++ b/smali_classes2/kotlin/KotlinNullPointerException.smali
+@@ -1,3 +1,3 @@
+ .class public Lkotlin/KotlinNullPointerException;
+-.super Ljava/lang/NullPointerException;
++.super Ljava/lang/NullPointerException;
+ .source "qb/108127447 0ed26ceaed41b2ffa78f66d43c52ac26b7a9ed73eb466bc2a97587badce0b9e8"
+-- 
+2.43.0

@@ -1,0 +1,33 @@
+From e5dd11e42c09d1b1df89d10561538f359b2e25ea Mon Sep 17 00:00:00 2001
+From: ExtremeXT <75576145+ExtremeXT@users.noreply.github.com>
+Date: Thu, 11 Dec 2025 21:12:36 +0100
+Subject: [PATCH] Disable APK signature check
+
+Signed-off-by: dupazlasu <dupazlasu66@gmail.com>
+---
+ .../android/util/apk/ApkSignatureVerifier.smali          | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/smali_classes4/android/util/apk/ApkSignatureVerifier.smali b/smali_classes4/android/util/apk/ApkSignatureVerifier.smali
+index ea5f4931..2f34a36e 100644
+--- a/smali_classes4/android/util/apk/ApkSignatureVerifier.smali
++++ b/smali_classes4/android/util/apk/ApkSignatureVerifier.smali
+@@ -193,15 +193,6 @@
+ .method public static blacklist getMinimumSignatureSchemeVersionForTargetSdk(I)I
+     .locals 1
+ 
+-    const/16 v0, 0x1e
+-
+-    if-lt p0, v0, :cond_0
+-
+-    const/4 p0, 0x2
+-
+-    return p0
+-
+-    :cond_0
+     const/4 p0, 0x1
+ 
+     return p0
+-- 
+2.51.0
+
