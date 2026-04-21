@@ -13,8 +13,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.sma
 --- a/smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali
 +++ b/smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali
 @@ -2200,7 +2200,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public declared-synchronized getDumpLogs()Ljava/lang/String;
 -    .locals 3
@@ -37,8 +36,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/SemWifiApChipInfo$SemWifiA
 +    move-result p0
 +
 +    return p0
-+:cond_99
-    .end method
++.end method
 +
      array-length v0, p1
  
@@ -47,8 +45,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/SemWifiApChipInfo.smali b/
 --- a/smali/com/samsung/android/server/wifi/ap/SemWifiApChipInfo.smali
 +++ b/smali/com/samsung/android/server/wifi/ap/SemWifiApChipInfo.smali
 @@ -1712,11 +1712,11 @@
- :cond_99
-    .end method
+ .end method
  
  .method public supportThisSoftApFeature(I)Z
 -    .locals 3

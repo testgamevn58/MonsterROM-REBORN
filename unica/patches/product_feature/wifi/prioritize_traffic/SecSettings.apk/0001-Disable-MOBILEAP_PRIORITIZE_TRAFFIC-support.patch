@@ -16,8 +16,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/Wif
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApFrameworkUtils.smali
 @@ -804,50 +804,6 @@
      return p0
- :cond_99
-    .end method
+ .end method
  
 -.method public static isPrioritizeRealTimeTrafficOn(Landroid/content/Context;)Z
 -    .locals 3
@@ -61,8 +60,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/Wif
 -    invoke-static {v1, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
 -
 -    return v2
--:cond_99
-    .end method
+-.end method
 -
  .method public static isWiFiStateDisablingOrDisabled(Landroid/content/Context;)Z
      .locals 1
@@ -73,8 +71,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/Wif
      invoke-virtual {p0, p1}, Lcom/samsung/android/wifi/SemWifiManager;->setWifiApGuestModeEnabled(Z)V
 -
 -    return-void
--:cond_99
-    .end method
+-.end method
 -
 -.method public static setPrioritizeRealTimeTrafficDB(Landroid/content/Context;Z)V
 -    .locals 2
@@ -117,8 +114,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/Wif
 -    invoke-static {v1, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
  
      return-void
- :cond_99
-    .end method
+ .end method
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSettings$1.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSettings$1.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSettings$1.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSettings$1.smali
@@ -145,8 +141,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSet
 +    :cond_2
 +    :goto_0
      return-object p0
- :cond_99
-    .end method
+ .end method
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApCloudBackupRestore.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApCloudBackupRestore.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApCloudBackupRestore.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApCloudBackupRestore.smali
@@ -224,8 +219,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApClo
 +    :cond_1b
      :goto_f
      return-void
- :cond_99
-    .end method
+ .end method
 @@ -2621,7 +2621,7 @@
      invoke-static {v13, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
  
@@ -287,8 +281,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSma
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSmartSwitchBackupRestore.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSmartSwitchBackupRestore.smali
 @@ -1241,7 +1241,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public final loadOtherConf(Landroid/content/Context;Ljava/lang/String;)Z
 -    .locals 20
@@ -397,7 +390,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSma
      :try_start_b
      invoke-virtual {v0, v4}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
 @@ -1728,17 +1728,17 @@
-     if-le v7, v12, :cond_unica_unique
+     if-le v7, v12, :cond_c
  
      :try_start_d
 -    aget-object v7, v0, v18
@@ -424,7 +417,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSma
  
 @@ -1777,7 +1777,7 @@
  
-     :cond_unica_unique
+     :cond_c
      :try_start_f
 -    aget-object v7, v0, v18
 +    aget-object v7, v0, v17
@@ -762,8 +755,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSma
 +    :cond_31
      :goto_26
      throw v1
- :cond_99
-    .end method
+ .end method
 @@ -6014,7 +5965,7 @@
  
      goto :goto_5
@@ -781,7 +773,6 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSma
 +    :cond_f
      :goto_a
      throw v1
- :cond_99
-    .end method
+ .end method
 -- 
 2.43.0

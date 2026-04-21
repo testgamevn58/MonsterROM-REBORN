@@ -21,7 +21,6 @@ diff --git a/smali_classes5/com/samsung/android/settings/asbase/vibration/Virtua
 +    const/4 p0, 0x3
  
      return p0
- :cond_99
-    .end method
+ .end method
 -- 
 2.43.0

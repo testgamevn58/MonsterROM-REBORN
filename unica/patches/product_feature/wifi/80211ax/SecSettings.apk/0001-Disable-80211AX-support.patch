@@ -146,8 +146,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/develop/WifiLabsWe
      invoke-virtual {p0, v0}, Landroid/widget/RelativeLayout;->setVisibility(I)V
  
      return-void
-+:cond_99
-    .end method
++.end method
 +
 +.method public final getDPfromPixel(I)I
 +    .locals 1
@@ -173,8 +172,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/develop/WifiLabsWe
 +    float-to-int p0, p0
 +
 +    return p0
- :cond_99
-    .end method
+ .end method
  
  .method public final getPointDrawable$1(I)Landroid/graphics/drawable/Drawable;
 @@ -1108,6 +1110,8 @@
@@ -223,8 +221,7 @@ diff --git a/smali_classes2/com/samsung/android/wifitrackerlib/SemWifiUtils.smal
 +++ b/smali_classes2/com/samsung/android/wifitrackerlib/SemWifiUtils.smali
 @@ -523,29 +523,6 @@
      return v1
- :cond_99
-    .end method
+ .end method
  
 -.method public static isSecured(I)Z
 -    .locals 1
@@ -247,8 +244,7 @@ diff --git a/smali_classes2/com/samsung/android/wifitrackerlib/SemWifiUtils.smal
 -    const/4 p0, 0x0
 -
 -    return p0
--:cond_99
-    .end method
+-.end method
 -
  .method public static isSimCardReady(Landroid/telephony/TelephonyManager;)Z
      .locals 5
@@ -258,8 +254,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
 +++ b/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali
 @@ -1797,43 +1797,6 @@
      return p0
- :cond_99
-    .end method
+ .end method
  
 -.method public final semIsWifi6Network()Z
 -    .locals 4
@@ -296,8 +291,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
 -
 -    :cond_2
 -    return v1
--:cond_99
-    .end method
+-.end method
 -
  .method public semMatches(Landroid/net/wifi/WifiConfiguration;)Z
      .locals 0
@@ -340,8 +334,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
  # instance fields
  .field public mContext:Landroid/content/Context;
 @@ -92,7 +88,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public final onBindViewHolder(Landroidx/recyclerview/widget/RecyclerView$ViewHolder;I)V
 -    .locals 11
@@ -362,7 +355,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
      move v4, v8
  
      :goto_0
--    if-eqz v3, :cond_unica_unique
+-    if-eqz v3, :cond_c
 +    if-eqz v3, :cond_8
  
      invoke-virtual {v3}, Landroid/graphics/drawable/StateListDrawable;->getCurrent()Landroid/graphics/drawable/Drawable;
@@ -434,7 +427,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
 -
 -    invoke-virtual {v3, v2}, Landroid/graphics/drawable/StateListDrawable;->setState([I)Z
 -
--    :cond_unica_unique
+-    :cond_c
      :goto_2
      sget v2, Lcom/samsung/android/settings/wifi/McfAutoHotspotListAdapter$McfAutoHotspotViewHolder;->$r8$clinit:I
  
@@ -500,7 +493,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
 +    goto :goto_3
 +
 +    :cond_b
-+    if-gez v0, :cond_unica_unique
++    if-gez v0, :cond_c
 +
 +    const-string v3, "onBindViewHolder() - Selected  BleAp is in (Failed)/(Connection Timed out) state"
 +
@@ -526,7 +519,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
 +
 +    goto :goto_4
 +
-+    :cond_unica_unique
++    :cond_c
 +    const-string v3, "onBindViewHolder() - Available Hotspot live device"
 +
 +    invoke-static {v1, v3}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
@@ -705,8 +698,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/AutoHotspotListAda
      invoke-static {}, Lcom/android/settings/Utils;->isProductDev()Z
  
 @@ -98,7 +94,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public final onBindViewHolder(Landroidx/recyclerview/widget/RecyclerView$ViewHolder;I)V
 -    .locals 11

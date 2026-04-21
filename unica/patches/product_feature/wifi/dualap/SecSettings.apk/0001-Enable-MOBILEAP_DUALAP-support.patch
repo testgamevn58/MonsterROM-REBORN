@@ -22,7 +22,7 @@ UN1CA: this patch is not complete! Please check unica/patches/product_feature/cu
  .../mobileap/utils/WifiApSoftApUtils.smali    |  33 +-
  .../views/WifiApSeekBarPreference$1.smali     |  46 ++-
  16 files changed, 980 insertions(+), 578 deletions(-)
- create mode 100644 smali_classes3/com/samsung/android/settings/wifi/mobileap/WifiApSmartSwitchBackupRestore$3.smali
+ create mode 100644 smali_classes5/com/samsung/android/settings/wifi/mobileap/WifiApSmartSwitchBackupRestore$3.smali
 
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler.smali
@@ -208,7 +208,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/datamodel
  
      const v5, 0x7f153742
  
-+    if-eqz v1, :cond_unica_unique
++    if-eqz v1, :cond_c
 +
 +    invoke-virtual {p0}, Lcom/samsung/android/settings/wifi/mobileap/datamodels/WifiApBandConfig;->isThisBand2Ghz()Z
 +
@@ -369,7 +369,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/datamodel
  
      move-result v1
  
--    if-eqz v1, :cond_unica_unique
+-    if-eqz v1, :cond_c
 +    if-eqz v1, :cond_10
  
      invoke-virtual {p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
@@ -378,7 +378,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/datamodel
  
      goto :goto_2
  
--    :cond_unica_unique
+-    :cond_c
 +    :cond_10
      const v1, 0x7f15373e
  
@@ -422,8 +422,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/datamodel
 @@ -517,3 +581,34 @@
      :cond_0
      return v1
- :cond_99
-    .end method
+ .end method
 +
 +.method public final isThisDualBand2GhzAnd5Ghz()Z
 +    .locals 1
@@ -454,14 +453,12 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/datamodel
 +    const/4 p0, 0x0
 +
 +    return p0
-+:cond_99
-    .end method
++.end method
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApFrameworkUtils.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApFrameworkUtils.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApFrameworkUtils.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApFrameworkUtils.smali
 @@ -631,7 +631,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public static isBandSeekBarUxSupported(Landroid/content/Context;)Z
 -    .locals 4
@@ -577,8 +574,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApEdi
 +    invoke-virtual {p0}, Lcom/samsung/android/settings/wifi/mobileap/WifiApEditSettings;->buildNewSoftApConfiguration()V
 +
 +    return-void
-+:cond_99
-    .end method
++.end method
 +
  .method static constructor <clinit>()V
      .locals 2
@@ -736,12 +732,12 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApEdi
      move-result v3
  
 -    if-eqz v3, :cond_b
-+    if-eqz v3, :cond_unica_unique
++    if-eqz v3, :cond_c
  
      iput-boolean v6, p0, Lcom/samsung/android/settings/wifi/mobileap/WifiApEditSettings;->resetSoftAp:Z
  
 -    :cond_b
-+    :cond_unica_unique
++    :cond_c
      iget-object v3, p0, Lcom/samsung/android/settings/wifi/mobileap/WifiApEditSettings;->mContext:Landroidx/fragment/app/FragmentActivity;
  
      invoke-static {v3}, Lcom/samsung/android/settings/wifi/mobileap/utils/WifiApSoftApUtils;->getWifiApBandConfig(Landroid/content/Context;)Lcom/samsung/android/settings/wifi/mobileap/datamodels/WifiApBandConfig;
@@ -749,7 +745,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApEdi
  
      move-result v5
  
--    if-eq v3, v5, :cond_unica_unique
+-    if-eq v3, v5, :cond_c
 +    if-eq v3, v5, :cond_d
  
      iget-object v3, p0, Lcom/samsung/android/settings/wifi/mobileap/WifiApEditSettings;->mContext:Landroidx/fragment/app/FragmentActivity;
@@ -758,12 +754,12 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApEdi
  
      move-result v3
  
--    if-eqz v3, :cond_unica_unique
+-    if-eqz v3, :cond_c
 +    if-eqz v3, :cond_d
  
      iput-boolean v6, p0, Lcom/samsung/android/settings/wifi/mobileap/WifiApEditSettings;->resetSoftAp:Z
  
--    :cond_unica_unique
+-    :cond_c
 +    :cond_d
      iget-object v3, p0, Lcom/samsung/android/settings/wifi/mobileap/WifiApEditSettings;->mSupportWifi6Controller:Lcom/samsung/android/settings/wifi/mobileap/configure/WifiApConfigureSupportWifi6Controller;
  
@@ -837,8 +833,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApEdi
 -    :cond_11
 +    :cond_12
      return-void
- :cond_99
-    .end method
+ .end method
  
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/views/WifiApSeekBarPreference$1.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/views/WifiApSeekBarPreference$1.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/views/WifiApSeekBarPreference$1.smali
@@ -935,8 +930,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/views/Wif
 -    :cond_2
 +    :cond_3
      return-void
- :cond_99
-    .end method
+ .end method
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler1.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler1.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler1.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler1.smali
@@ -1055,8 +1049,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/Utils.smali b/smali_class
 @@ -3707,3 +3711,35 @@
  
      return-object p0
- :cond_99
-    .end method
+ .end method
 +.method public static supportBridgedApStaConcurrency()Z
 +    .locals 3
 +
@@ -1087,15 +1080,13 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/Utils.smali b/smali_class
 +
 +    :cond_1
 +    return v1
-+:cond_99
-    .end method
++.end method
 +
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApSoftApUtils.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApSoftApUtils.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApSoftApUtils.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApSoftApUtils.smali
 @@ -404,7 +404,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public static getSupportedBandList(Landroid/content/Context;)Ljava/util/List;
 -    .locals 4
@@ -1160,8 +1151,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/Wif
 -    :cond_1
 +    :cond_2
      return-object v0
- :cond_99
-    .end method
+ .end method
  
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/dialogs/WifiApDialogP2pWifiDirectDisconnect.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/dialogs/WifiApDialogP2pWifiDirectDisconnect.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/dialogs/WifiApDialogP2pWifiDirectDisconnect.smali
@@ -1192,8 +1182,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/dialogs/W
 +    const/4 p0, 0x1
 +
 +    return p0
- :cond_99
-    .end method
+ .end method
  
  .method public final onCreate(Landroid/os/Bundle;)V
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApWarning.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApWarning.smali
@@ -1321,8 +1310,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApWar
 +    invoke-virtual {v0, v1, v6, v7}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
  
      return-void
- :cond_99
-    .end method
+ .end method
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/dialogs/WifiApDialogSmartViewTurnOff.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/dialogs/WifiApDialogSmartViewTurnOff.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/dialogs/WifiApDialogSmartViewTurnOff.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/dialogs/WifiApDialogSmartViewTurnOff.smali

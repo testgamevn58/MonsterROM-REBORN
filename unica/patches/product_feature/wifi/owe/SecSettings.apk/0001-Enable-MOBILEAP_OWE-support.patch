@@ -17,8 +17,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwi
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApSwitchEnabler.smali
 @@ -1772,7 +1772,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public final onCheckedChanged(Landroid/widget/CompoundButton;Z)V
 -    .locals 4
@@ -236,8 +235,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/datamodel
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/datamodels/WifiApConfiguration.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/datamodels/WifiApConfiguration.smali
 @@ -483,7 +483,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public final setConfiguration(Lcom/samsung/android/settings/wifi/mobileap/dialogs/WifiApDialogRestoreNetworkNamePassword$1;)V
 -    .locals 9
@@ -646,8 +644,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/configure
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/configure/WifiApConfigureSecurityDropDownController.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/configure/WifiApConfigureSecurityDropDownController.smali
 @@ -552,7 +552,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public handlePreferenceTreeClick(Landroidx/preference/Preference;)Z
 -    .locals 2
@@ -874,8 +871,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/configure
 -    :cond_2
 +    :cond_5
      return-void
- :cond_99
-    .end method
+ .end method
  
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApDashboardPasswordController.smali b/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApDashboardPasswordController.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/WifiApDashboardPasswordController.smali
@@ -991,8 +987,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/Wif
 --- a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApSoftApUtils.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/WifiApSoftApUtils.smali
 @@ -51,38 +51,56 @@
- :cond_99
-    .end method
+ .end method
  
  .method public static checkIfSecurityTypeIsAnyOpenVariant(I)Z
 -    .locals 4
@@ -1071,8 +1066,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/mobileap/utils/Wif
 -
 -    :cond_1
 -    return v1
- :cond_99
-    .end method
+ .end method
  
  .method public static getBandArray(Landroid/content/Context;)[I
 -- 

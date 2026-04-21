@@ -77,6 +77,11 @@ system/etc/permissions/privapp-permissions-com.sec.bcservice.xml
 system/priv-app/BCService
 "
 
+# CIDManager
+SYSTEM_DEBLOAT+="
+system/priv-app/CIDManager
+"
+
 # Gaming Hub
 SYSTEM_DEBLOAT+="
 system/etc/permissions/privapp-permissions-com.samsung.android.game.gamehome.xml
@@ -174,11 +179,6 @@ SYSTEM_DEBLOAT+="
 system/etc/permissions/privapp-permissions-com.mygalaxy.service.xml
 system/etc/sysconfig/preinstalled-packages-com.mygalaxy.service.xml
 system/priv-app/MyGalaxyService
-"
-
-# Phoneconfiguration
-SYSTEM_DEBLOAT+="
-system/priv-app/CIDManager
 "
 
 # Samsung Analytics

@@ -128,14 +128,14 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
             "V2_0" \
             > /dev/null
         SMALI_PATCH "system" "system/framework/services.jar" \
-            "smali/com/android/server/biometrics/sensors/face/hidl/TestHal.smali" "replaceall" \
+            "smali/com/android/server/biometrics/sensors/face/aidl/TestHal.smali" "replaceall" \
             "V3_0" \
             "V2_0" \
             > /dev/null
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl\$\$ExternalSyntheticLambda6.smali" "remove"
-        LOG "- Removing \"smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace.smali\" from /system/system/framework/services.jar"
-        EVAL "rm \"$APKTOOL_DIR/system/framework/services.jar/smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace.smali\""
+        LOG "- Removing \"smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace.smali\" from /system/system/framework/services.jar"
+        EVAL "rm \"$APKTOOL_DIR/system/framework/services.jar/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace.smali\""
         LOG "- Removing \"smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace\$Proxy.smali\" from /system/system/framework/services.jar"
         EVAL "rm \"$APKTOOL_DIR/system/framework/services.jar/smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace\\\$Proxy.smali\""
         SMALI_PATCH "system" "system/framework/services.jar" \
@@ -143,7 +143,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFaceClientCallback\$Proxy.smali" "remove"
         SMALI_PATCH "system" "system/framework/services.jar" \
-            "smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFaceClientCallback.smali" "remove"
+            "smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFaceClientCallback.smali" "remove"
     fi
 fi
 
@@ -220,6 +220,19 @@ if [ -f "$WORK_DIR/system/system/priv-app/StorageShare/StorageShare.apk" ]; then
     fi
 fi
 
+# Ensure Sem eBPF Smart Hotspot functionality (pre-API 35)
+# - Check for TARGET_PLATFORM_SDK_VERSION < 35 as 4.14 kernel support has been deprecated in Android V
+# - Disable "ro.kernel.version" == "4.14" leftover checks, 4.14 needs eBPF kernel backports anyway
+if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
+    EXTRACT_KERNEL_IMAGE
+    if grep -q "Linux version 4.14" "$TMP_DIR/out/kernel"; then
+        PATCHED=true
+        # [b.eq #0xXXXXXX] -> [nop]
+        HEX_PATCH "$WORK_DIR/system/system/bin/netd" "e001005480feff90" "1f2003d580feff90"
+        HEX_PATCH "$WORK_DIR/system/system/bin/netd" "2001005480feff90" "1f2003d580feff90"
+    fi
+fi
+
 # Ensure sbauth support in target firmware
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 if [ -f "$WORK_DIR/system/system/bin/sbauth" ] && \
@@ -231,7 +244,7 @@ fi
 
 # Ensure PASS support (pre-API 35)
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
-    if ! grep -q "sec_pass_data_file" "$WORK_DIR/vendor/etc/selinux/vendor_sepolicy.cil"; then
+    if ! grep -q "sec_pass_data_file" "$WORK_DIR/vendor/etc/selinux/vendor_file_contexts"; then
         PATCHED=true
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali/com/android/server/StorageManagerService.smali" "return" \

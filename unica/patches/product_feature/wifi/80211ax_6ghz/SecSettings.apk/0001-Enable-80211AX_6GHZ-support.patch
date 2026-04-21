@@ -144,8 +144,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/develop/WifiLabsWe
 +    invoke-virtual {p0, p3}, Landroid/widget/RelativeLayout;->setVisibility(I)V
  
      return-void
- :cond_99
-    .end method
+ .end method
 @@ -1068,8 +1040,6 @@
  
      check-cast v0, Landroid/widget/RelativeLayout;
@@ -338,8 +337,7 @@ diff --git a/smali_classes2/com/android/settings/wifi/slice/WifiSlice.smali b/sm
 +    sput-object v0, Lcom/android/settings/wifi/slice/WifiSlice;->STATE_WIFI6E_NONE:[I
  
      return-void
- :cond_99
-    .end method
+ .end method
 @@ -928,7 +946,7 @@
  
      iget-object v1, p0, Lcom/android/settings/wifi/slice/WifiSlice;->mFrictionSld:Landroid/graphics/drawable/StateListDrawable;
@@ -365,8 +363,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/StandardWifiEntry.smali b
      .catchall {:try_start_1 .. :try_end_1} :catchall_0
  
      throw p1
-+:cond_99
-    .end method
++.end method
 +
 +.method public final declared-synchronized semIs6GHzOnly()Z
 +    .locals 2
@@ -411,8 +408,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/StandardWifiEntry.smali b
 +    .catchall {:try_start_1 .. :try_end_1} :catchall_0
 +
 +    throw v0
- :cond_99
-    .end method
+ .end method
  
  .method public final semIsAdminRestricted()Z
 diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali
@@ -425,8 +421,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
 +    const/4 p0, 0x0
 +
 +    return p0
-+:cond_99
-    .end method
++.end method
 +
 +.method public final checkWifi6EStandard(II)Z
 +    .locals 1
@@ -482,8 +477,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
      return p0
 @@ -1734,6 +1788,153 @@
      return p0
- :cond_99
-    .end method
+ .end method
  
 +.method public final semGetHighestSecurity()I
 +    .locals 7
@@ -630,8 +624,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
 +        :pswitch_5
 +        :pswitch_5
 +    .end packed-switch
-+:cond_99
-    .end method
++.end method
 +
  .method public semGetSecurityString(Ljava/lang/String;)Ljava/lang/String;
      .locals 0
@@ -640,8 +633,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
      move-result-object p0
  
      return-object p0
-+:cond_99
-    .end method
++.end method
 +
 +.method public semIs6GHzOnly()Z
 +    .locals 0
@@ -649,8 +641,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
 +    const/4 p0, 0x0
 +
 +    return p0
- :cond_99
-    .end method
+ .end method
  
  .method public semIsAdminRestricted()Z
 @@ -1793,6 +2002,35 @@
@@ -659,8 +650,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
      const/4 p0, 0x0
 +
 +    return p0
-+:cond_99
-    .end method
++.end method
 +
 +.method public final semIsWifi6ENetwork()Z
 +    .locals 2
@@ -689,8 +679,7 @@ diff --git a/smali_classes2/com/android/wifitrackerlib/WifiEntry.smali b/smali_c
 +    iget-boolean p0, p0, Lcom/samsung/android/wifitrackerlib/SemWifiEntryFlags;->has6EStandard:Z
  
      return p0
- :cond_99
-    .end method
+ .end method
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/WifiListAdapter.smali b/smali_classes2/com/samsung/android/settings/wifi/WifiListAdapter.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/WifiListAdapter.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/WifiListAdapter.smali
@@ -729,8 +718,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/WifiListAdapter.sm
 +    sput-object v0, Lcom/samsung/android/settings/wifi/WifiListAdapter;->STATE_WIFI6E_SECURED:[I
  
      return-void
- :cond_99
-    .end method
+ .end method
 @@ -239,7 +257,7 @@
  .method public final updateIcon(Landroid/widget/ImageView;Landroid/graphics/drawable/StateListDrawable;Lcom/android/wifitrackerlib/WifiEntry;)V
      .locals 9
@@ -753,14 +741,14 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/WifiListAdapter.sm
  
      move-result v1
  
--    if-eqz v1, :cond_unica_unique
+-    if-eqz v1, :cond_c
 +    if-eqz v1, :cond_e
  
      sget-object v1, Lcom/samsung/android/settings/wifi/WifiListAdapter;->STATE_WIFI5_SECURED:[I
  
 -    goto :goto_5
 -
--    :cond_unica_unique
+-    :cond_c
 +    goto :goto_6
 +
 +    :cond_e
@@ -804,18 +792,15 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/WifiListAdapter.sm
  
 -    :cond_12
 -    return-void
--:cond_99
-    .end method
+-.end method
 +    :cond_14
 +    return-void
-+:cond_99
-    .end method
++.end method
 diff --git a/smali_classes2/com/samsung/android/settings/wifi/details/WifiAutoConnectPreferenceController.smali b/smali_classes2/com/samsung/android/settings/wifi/details/WifiAutoConnectPreferenceController.smali
 --- a/smali_classes2/com/samsung/android/settings/wifi/details/WifiAutoConnectPreferenceController.smali
 +++ b/smali_classes2/com/samsung/android/settings/wifi/details/WifiAutoConnectPreferenceController.smali
 @@ -520,7 +520,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public setChecked(Z)Z
 -    .locals 11
@@ -930,8 +915,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
 +    sput-object v0, Lcom/samsung/android/settings/wifi/McfAutoHotspotListAdapter;->STATE_WIFI6E_NONE:[I
  
      return-void
- :cond_99
-    .end method
+ .end method
 @@ -102,7 +120,7 @@
  
      invoke-static {v1, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
@@ -945,7 +929,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
      move v4, v8
  
      :goto_0
--    if-eqz v3, :cond_unica_unique
+-    if-eqz v3, :cond_c
 +    if-eqz v3, :cond_e
  
      invoke-virtual {v3}, Landroid/graphics/drawable/StateListDrawable;->getCurrent()Landroid/graphics/drawable/Drawable;
@@ -968,7 +952,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
 +    goto :goto_2
 +
 +    :cond_a
-+    if-ne v2, v4, :cond_unica_unique
++    if-ne v2, v4, :cond_c
 +
 +    iget v2, p2, Lcom/samsung/android/wifi/SemWifiApBleScanResult;->mSecurity:I
 +
@@ -985,7 +969,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
      goto :goto_2
  
 -    :cond_a
-+    :cond_unica_unique
++    :cond_c
      iget v2, p2, Lcom/samsung/android/wifi/SemWifiApBleScanResult;->mSecurity:I
  
 -    if-ne v2, v9, :cond_b
@@ -1003,7 +987,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/McfAutoHotspotList
  
      invoke-virtual {v3, v2}, Landroid/graphics/drawable/StateListDrawable;->setState([I)Z
  
--    :cond_unica_unique
+-    :cond_c
 +    :cond_e
      :goto_2
      sget v2, Lcom/samsung/android/settings/wifi/McfAutoHotspotListAdapter$McfAutoHotspotViewHolder;->$r8$clinit:I
@@ -1190,8 +1174,7 @@ diff --git a/smali_classes2/com/samsung/android/settings/wifi/AutoHotspotListAda
 +    sput-object v0, Lcom/samsung/android/settings/wifi/AutoHotspotListAdapter;->STATE_WIFI6E_NONE:[I
  
      return-void
- :cond_99
-    .end method
+ .end method
 @@ -390,7 +408,7 @@
  
      goto :goto_4

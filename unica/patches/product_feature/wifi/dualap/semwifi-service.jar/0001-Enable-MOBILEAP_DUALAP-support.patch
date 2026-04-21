@@ -65,8 +65,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/SemSoftApManager.smali b/s
  
      iput-boolean v0, p0, Lcom/samsung/android/server/wifi/ap/SemSoftApManager;->mSkipWifiSharingWhenNetworkCountryChange:Z
 @@ -2632,7 +2634,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public final handleWifiSharingSoftap(Z)V
 -    .locals 5
@@ -159,8 +158,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/smarttethering/SemWifiApSm
      iget-object p0, p0, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartGattServer;->mWifiApSmartUtil:Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartUtil;
  
      return-object p0
-+:cond_99
-    .end method
++.end method
 +
 +.method static bridge synthetic -$$Nest$sfgetmDualAp5GHzChannels()Landroid/util/SparseIntArray;
 +    .locals 1
@@ -168,8 +166,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/smarttethering/SemWifiApSm
 +    sget-object v0, Lcom/samsung/android/server/wifi/ap/smarttethering/SemWifiApSmartGattServer;->mDualAp5GHzChannels:Landroid/util/SparseIntArray;
 +
 +    return-object v0
- :cond_99
-    .end method
+ .end method
  
  .method static constructor <clinit>()V
 diff --git a/smali/com/samsung/android/server/wifi/ap/SemSoftapUtils.smali b/smali/com/samsung/android/server/wifi/ap/SemSoftapUtils.smali
@@ -335,8 +332,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/SemSoftApManager$1.smali b
 --- a/smali/com/samsung/android/server/wifi/ap/SemSoftApManager$1.smali
 +++ b/smali/com/samsung/android/server/wifi/ap/SemSoftApManager$1.smali
 @@ -572,7 +572,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public onInfoChanged(Ljava/util/List;)V
 -    .locals 10
@@ -368,8 +364,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.sma
 --- a/smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali
 +++ b/smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali
 @@ -2647,17 +2647,57 @@
- :cond_99
-    .end method
+ .end method
  
  .method public isWifiApEnabledWithDualBand()Z
 -    .locals 1
@@ -434,13 +429,11 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.sma
 +    invoke-static {v1, p0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
 +
 +    return v0
- :cond_99
-    .end method
+ .end method
  
  .method public isWifiApGuestModeEnabled()Z
 @@ -2801,7 +2841,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public setSoftApConfiguration(Landroid/net/wifi/SoftApConfiguration;Z)Landroid/net/wifi/SoftApConfiguration;
 -    .locals 21
@@ -479,8 +472,7 @@ diff --git a/smali/com/samsung/android/server/wifi/ap/SemWifiApTrafficPoller.sma
 +    iput-object p1, p0, Lcom/samsung/android/server/wifi/ap/SemWifiApTrafficPoller;->mConnectivityPacketLogForDualHotspot:Landroid/util/LocalLog;
 +
 +    return-void
-+:cond_99
-    .end method
++.end method
 +
  
      invoke-interface {p1, v1}, Ljava/util/List;->remove(I)Ljava/lang/Object;

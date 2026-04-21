@@ -11,8 +11,7 @@ diff --git a/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvi
 --- a/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali
 +++ b/smali/com/samsung/android/server/wifi/driver/WifiDriverFeatureProvider.smali
 @@ -487,7 +487,7 @@
- :cond_99
-    .end method
+ .end method
  
  .method public getStdPlusFeature()J
 -    .locals 4

@@ -1,0 +1,23 @@
+From a33869484e38bc2a500ce22c47fcec3510b57f1f Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Fri, 10 Oct 2025 10:45:12 +0200
+Subject: [PATCH] Disable A11Y_COLOR_BOOL_SUPPORT_DMC_COLORWEAKNESS
+
+---
+ .../android/view/accessibility/A11yRune.smali | 39 ++++++++-----------
+ 1 file changed, 17 insertions(+), 22 deletions(-)
+
+diff --git a/smali_classes4/android/view/accessibility/A11yRune.smali b/smali_classes4/android/view/accessibility/A11yRune.smali
+--- a/smali_classes4/android/view/accessibility/A11yRune.smali
++++ b/smali_classes4/android/view/accessibility/A11yRune.smali
+@@ -155,7 +155,7 @@
+ 
+ # direct methods
+ .method static constructor blacklist <clinit>()V
+-    .locals 4
++    .locals 3
+ 
+     const-string/jumbo v0, "ro.product.first_api_level"
+ 
+-- 
+2.43.0

@@ -1,5 +1,28 @@
+From f34a5971f60e85abfada68ebfd24bcfe295cc804 Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Mon, 13 Oct 2025 22:01:18 +0200
+Subject: [PATCH] Remove CUSTOM_BACKOFF value
+
+UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
+---
+ .../server/wifi/SemWifiCoexManager.smali      | 656 +++++++++---------
+ 1 file changed, 327 insertions(+), 329 deletions(-)
+
+diff --git a/smali/com/samsung/android/server/wifi/SemWifiCoexManager.smali b/smali/com/samsung/android/server/wifi/SemWifiCoexManager.smali
 --- a/smali/com/samsung/android/server/wifi/SemWifiCoexManager.smali
 +++ b/smali/com/samsung/android/server/wifi/SemWifiCoexManager.smali
-@@ -14,1 +14,1 @@
--.field public static final CUSTOM_BACKOFF_TYPE:Ljava/lang/String; = "CONFIG_CUSTOM_BACKOFF"
-+.field public static final CUSTOM_BACKOFF_TYPE:Ljava/lang/String; = ""
+@@ -1029,9 +1029,9 @@
+ 
+     iget-object p4, p0, Lcom/samsung/android/server/wifi/SemWifiCoexManager;->mCustomBackoffArray:[Ljava/lang/String;
+ 
+-    add-int/lit8 p2, p2, 0x2
+-
+-    aget-object p4, p4, p2
++    add-int/lit8 p3, p3, 0x2
++
++    aget-object p4, p4, p3
+ 
+     invoke-static {p4}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+ 
+-- 
+2.43.0

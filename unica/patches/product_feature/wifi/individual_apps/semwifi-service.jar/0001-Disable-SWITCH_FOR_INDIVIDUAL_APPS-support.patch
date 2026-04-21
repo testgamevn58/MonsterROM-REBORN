@@ -52,8 +52,7 @@ diff --git a/smali/com/samsung/android/server/wifi/SemWifiConnectivityMonitor.sm
 +    invoke-static {p0, v0, v1}, Lcom/samsung/android/server/wifi/SemEasySetupWifiManager$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Z)V
 +
 +    return v1
- :cond_99
-    .end method
+ .end method
  
  .method public final isInvalidState()Z
 -- 
