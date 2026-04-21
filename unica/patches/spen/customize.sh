@@ -3,8 +3,6 @@ REGION=$(echo -n "$TARGET_FIRMWARE" | cut -d "/" -f 2)
 
 if [ -d "$FW_DIR/${MODEL}_${REGION}/system/system/media/audio/pensounds" ]; then
     LOG_STEP_IN "- Adding SPen stack"
-    ADD_TO_WORK_DIR "pa3qxxx" "system" "system/app/AirGlance"
-    ADD_TO_WORK_DIR "pa3qxxx" "system" "system/app/LiveDrawing"
     ADD_TO_WORK_DIR "pa3qxxx" "system" "system/etc/default-permissions/default-permissions-com.samsung.android.service.aircommand.xml"
     ADD_TO_WORK_DIR "pa3qxxx" "system" "system/etc/permissions/privapp-permissions-com.samsung.android.app.readingglass.xml"
     ADD_TO_WORK_DIR "pa3qxxx" "system" "system/etc/permissions/privapp-permissions-com.samsung.android.service.aircommand.xml"
