@@ -1,3 +1,6 @@
+if [[ $TARGET_SINGLE_SYSTEM_IMAGE == "qssi" || $TARGET_SINGLE_SYSTEM_IMAGE == "essi" ]]; then
+    LOG_STEP_IN "- Target device with 32-Bit HALs detected."
+
     LOG_STEP_IN "- Adding S23 FE (r11sxxx) lib/ blobs"
     ADD_TO_WORK_DIR "r11sxxx" "system" "system/lib" 0 0 644
 
@@ -38,3 +41,7 @@
     SET_PROP "vendor" "dalvik.vm.dex2oat64.enabled" "true"
     LOG_STEP_OUT
 
+    LOG_STEP_OUT
+else
+    LOG "- Target device does not use 32-Bit HALs. Ignoring."
+fi
