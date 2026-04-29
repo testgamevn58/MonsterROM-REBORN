@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<roms>
+  <rom channel="stable">
+    <version>3.1.0</version>
+    <date>2026-04-29</date>
+    <filename>MONSTERROM.zip</filename>
+    <part1>https://example.com/MONSTERROM.zip.part_00</part1>
+    <part2>https://example.com/MONSTERROM.zip.part_01</part2>
+    <part3>https://example.com/MONSTERROM.zip.part_02</part3>
+    <part4>https://example.com/MONSTERROM.zip.part_03</part4>
+    <part5>https://example.com/MONSTERROM.zip.part_04</part5>
+    <part6>https://example.com/MONSTERROM.zip.part_05</part6>
+    <md5>sha5sum_here</md5>
+    <size>size_in_bytes</size>
+  </rom>
+</roms>
